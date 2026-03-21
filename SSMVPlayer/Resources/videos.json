@@ -1,0 +1,357 @@
+[
+  {
+    "songName" : "つぼみ",
+    "songPersistentID" : "AFDA8303-1EAE-4286-AB9D-5F39E2BE6FCD/L0/001",
+    "idols" : [
+      "koharu",
+      "yukimi"
+    ]
+  },
+  {
+    "songName" : "つぼみ",
+    "songPersistentID" : "E19CB3B2-D4EC-4496-B4F6-D723FB3FD08B/L0/001",
+    "idols" : [
+      "koharu",
+      "arisu"
+    ]
+  },
+  {
+    "songName" : "つぼみ",
+    "songPersistentID" : "ACFA374F-9BE3-466A-B80C-1F3ACEE685B7/L0/001",
+    "idols" : [
+      "koharu",
+      "yoshino"
+    ]
+  },
+  {
+    "songName" : "つぼみ",
+    "songPersistentID" : "C5011166-9B40-4D4C-8BBB-5CC2F47BD752/L0/001",
+    "idols" : [
+      "koharu",
+      "yumi"
+    ]
+  },
+  {
+    "songName" : "つぼみ",
+    "songPersistentID" : "C0F29DCA-BE3F-4E62-9FF1-2FFCB1C017F0/L0/001",
+    "idols" : [
+      "yoshino",
+      "koharu"
+    ]
+  },
+  {
+    "songName" : "つぼみ",
+    "songPersistentID" : "9415EC16-31E8-4C58-BC5C-7446DADF35B8/L0/001",
+    "idols" : [
+      "yumi",
+      "koharu"
+    ]
+  },
+  {
+    "idols" : [
+      "yukimi",
+      "koharu"
+    ],
+    "songPersistentID" : "ED1C199A-19FE-4A88-A43B-FB0AFA2E2E4A/L0/001",
+    "songName" : "つぼみ"
+  },
+  {
+    "idols" : [
+      "yukimi",
+      "koharu"
+    ],
+    "songPersistentID" : "6A9B2B20-8DE5-4114-A49E-DA2C3E14AF11/L0/001",
+    "songName" : "Pretty Liar"
+  },
+  {
+    "songPersistentID" : "A5578053-796D-4999-A72D-945308DABA5D/L0/001",
+    "songName" : "Pretty Liar",
+    "idols" : [
+      "yoshino",
+      "koharu"
+    ]
+  },
+  {
+    "songPersistentID" : "1D7E8DA8-9BB7-4CA9-B332-6A15EA122F7C/L0/001",
+    "songName" : "Pretty Liar",
+    "idols" : [
+      "yumi",
+      "koharu"
+    ]
+  },
+  {
+    "songPersistentID" : "AFAC1D89-1DEB-480C-9E93-32343C59C464/L0/001",
+    "songName" : "Pretty Liar",
+    "idols" : [
+      "koharu",
+      "yumi"
+    ]
+  },
+  {
+    "idols" : [
+      "koharu",
+      "yoshino"
+    ],
+    "songName" : "Pretty Liar",
+    "songPersistentID" : "ABE0C1C2-E67C-4025-B767-2E7A1A4D4C6A/L0/001"
+  },
+  {
+    "idols" : [
+      "koharu",
+      "yukimi"
+    ],
+    "songName" : "Pretty Liar",
+    "songPersistentID" : "73123916-C8A7-4ADE-AA87-DCC87DDE44E9/L0/001"
+  },
+  {
+    "idols" : [
+      "koharu",
+      "arisu"
+    ],
+    "songName" : "Pretty Liar",
+    "songPersistentID" : "CD9C392D-7210-43E0-828B-87566229376F/L0/001"
+  },
+  {
+    "idols" : [
+      "yumi",
+      "koharu"
+    ],
+    "songName" : "ジュビリー",
+    "songPersistentID" : "B426BFCD-E965-4680-8107-326CD23282FC/L0/001"
+  },
+  {
+    "idols" : [
+      "yoshino",
+      "koharu"
+    ],
+    "songName" : "ジュビリー",
+    "songPersistentID" : "5F3390F7-B5EF-430F-A2B3-49B2F79FBBB1/L0/001"
+  },
+  {
+    "idols" : [
+      "yukimi",
+      "koharu"
+    ],
+    "songName" : "ジュビリー",
+    "songPersistentID" : "531BE2AE-D7FC-4167-80F8-6876A60D2A96/L0/001"
+  },
+  {
+    "idols" : [
+      "koharu",
+      "yumi"
+    ],
+    "songName" : "ジュビリー",
+    "songPersistentID" : "4C797EC3-9C40-45BF-AEA5-802C658B9DA2/L0/001"
+  },
+  {
+    "idols" : [
+      "koharu",
+      "yukimi"
+    ],
+    "songName" : "ジュビリー",
+    "songPersistentID" : "56C118C1-17F8-480A-9FFD-AD89D68ED509/L0/001"
+  },
+  {
+    "idols" : [
+      "arisu",
+      "koharu"
+    ],
+    "songName" : "ジュビリー",
+    "songPersistentID" : "7F350F9B-A0F6-4B23-A362-40B802EAEEC8/L0/001"
+  },
+  {
+    "idols" : [
+      "arisu",
+      "koharu",
+      "yukimi"
+    ],
+    "songName" : "Let’s Sail Away!!!",
+    "songPersistentID" : "40457AEF-6C9C-41C5-A141-41B0C3FFC599/L0/001"
+  },
+  {
+    "idols" : [
+      "arisu",
+      "koharu",
+      "yukimi"
+    ],
+    "songName" : "オレンジタイム",
+    "songPersistentID" : "710B1C0A-5D87-4545-9D5F-4F8B92000DE7/L0/001"
+  },
+  {
+    "idols" : [
+      "arisu",
+      "koharu",
+      "yukimi"
+    ],
+    "songName" : "UNIQU3 VOICES!!!",
+    "songPersistentID" : "546D6FD9-AC9C-443C-8DEA-1FB151456517/L0/001"
+  },
+  {
+    "idols" : [
+      "arisu",
+      "koharu",
+      "yukimi"
+    ],
+    "songName" : "心もよう",
+    "songPersistentID" : "30D4E90B-DAD3-4A2D-B004-ADCF18B51B68/L0/001"
+  },
+  {
+    "idols" : [
+      "arisu",
+      "koharu",
+      "yukimi"
+    ],
+    "songName" : "Trancing Pulse",
+    "songPersistentID" : "CCA16070-963C-45E2-B73C-A7D10FF605C3/L0/001"
+  },
+  {
+    "idols" : [
+      "koharu"
+    ],
+    "songName" : "ステップ！",
+    "songPersistentID" : "1AE171D9-2177-427A-9799-817591896912/L0/001"
+  },
+  {
+    "idols" : [
+      "koharu"
+    ],
+    "songName" : "風色メロディ",
+    "songPersistentID" : "CFBB0E7C-0F75-416B-BF50-8A3C714975CE/L0/001"
+  },
+  {
+    "idols" : [
+      "koharu"
+    ],
+    "songName" : "ショコラ・ティアラ",
+    "songPersistentID" : "17C95526-5674-475D-95B1-74F72A993475/L0/001"
+  },
+  {
+    "songPersistentID" : "96F8D954-D89E-4E6A-8545-F716B3E9F8FD/L0/001",
+    "songName" : "エヴリデイドリーム",
+    "idols" : [
+      "koharu"
+    ]
+  },
+  {
+    "songPersistentID" : "1AF0EAA9-5A57-49F1-949B-9726F45022B0/L0/001",
+    "songName" : "Pretty Liar",
+    "idols" : [
+      "koharu",
+      "arisu"
+    ]
+  },
+  {
+    "songPersistentID" : "D9C2BB31-F61A-4B3C-8838-7B01A7328FCB/L0/001",
+    "songName" : "薄紅",
+    "idols" : [
+      "koharu"
+    ]
+  },
+  {
+    "songPersistentID" : "7C582696-1DD7-4C71-A68E-4CAE9BD484FD/L0/001",
+    "songName" : "生存本能ヴァルキュリア",
+    "idols" : [
+      "arisu"
+    ]
+  },
+  {
+    "songPersistentID" : "51922226-029C-4A2A-A558-2998297A0392/L0/001",
+    "songName" : "Orange Sapphire",
+    "idols" : [
+      "koharu"
+    ]
+  },
+  {
+    "songPersistentID" : "0665AB74-58CA-4793-BF7A-C5864C2FE338/L0/001",
+    "songName" : "Starry-Go-Round",
+    "idols" : [
+      "koharu"
+    ]
+  },
+  {
+    "songPersistentID" : "FE3FEDB9-3D88-4524-83AD-80D6998CBBF3/L0/001",
+    "songName" : "Let’s Sail Away!!!",
+    "idols" : [
+      "arisu",
+      "koharu",
+      "yoshino"
+    ]
+  },
+  {
+    "songPersistentID" : "DC6D19F7-CF37-46BA-8563-A43F8FAB13CE/L0/001",
+    "songName" : "オルゴールの小箱",
+    "idols" : [
+      "koharu"
+    ]
+  },
+  {
+    "songPersistentID" : "324666CF-31C5-46B2-9209-2B73E1114282/L0/001",
+    "songName" : "認めてくれなくたっていいよ",
+    "idols" : [
+      "koharu"
+    ]
+  },
+  {
+    "songPersistentID" : "329F6D59-3677-4FCA-AE57-0068D20A4F99/L0/001",
+    "songName" : "この空の下",
+    "idols" : [
+      "yukimi",
+      "arisu",
+      "koharu"
+    ]
+  },
+  {
+    "songPersistentID" : "DBF22C16-DA8A-4CA0-9623-EC64D817CDF5/L0/001",
+    "songName" : "M@GIC☆",
+    "idols" : [
+      "koharu"
+    ]
+  },
+  {
+    "songName" : "夢をのぞいたら（for BEST3 VERSION）",
+    "songPersistentID" : "483277F8-5BF9-4C0A-940C-9C88399664E5/L0/001",
+    "idols" : [
+      "yoshino",
+      "koharu",
+      "arisu"
+    ]
+  },
+  {
+    "songName" : "つぼみ",
+    "songPersistentID" : "18724928-84D1-450E-98A5-47818BFF23EC/L0/001",
+    "idols" : [
+      "arisu",
+      "koharu"
+    ]
+  },
+  {
+    "songName" : "Pretty Liar",
+    "songPersistentID" : "E1D0487E-4BB4-48C9-AAEB-AE1DEF7AD9B8/L0/001",
+    "idols" : [
+      "arisu",
+      "koharu"
+    ]
+  },
+  {
+    "songName" : "ジュビリー",
+    "songPersistentID" : "DA7C312A-68D3-401C-8813-E35CDBEAAAC7/L0/001",
+    "idols" : [
+      "koharu",
+      "arisu"
+    ]
+  },
+  {
+    "songName" : "トキメキは赤くて甘い",
+    "songPersistentID" : "8DA4D521-DA2E-4092-A8ED-C6301D1EECDA/L0/001",
+    "idols" : [
+      "koharu"
+    ]
+  },
+  {
+    "songName" : "14平米にスーベニア",
+    "songPersistentID" : "E6504704-5610-42BB-BBC6-391EC931FA5B/L0/001",
+    "idols" : [
+      "koharu"
+    ]
+  }
+]
