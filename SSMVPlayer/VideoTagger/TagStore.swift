@@ -86,19 +86,10 @@ class TagStore {
 
 struct SongName: Decodable {
     let name: String
-    let `extension`: String
 }
 
 enum SongNameList {
-    static let songs: [SongName] = {
-        guard
-            let url = Bundle.main.url(forResource: "songs", withExtension: "json"),
-            let data = try? Data(contentsOf: url),
-            let decoded = try? JSONDecoder().decode([SongName].self, from: data)
-        else { return [] }
-        return decoded
-    }()
-
+    static let songs: [SongName] = allExistingSongs.map{ SongName(name: $0) }
     static let names: [String] = songs.map(\.name)
 }
 

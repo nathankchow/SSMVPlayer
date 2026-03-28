@@ -19,41 +19,30 @@ struct SongSelectView: View {
         }
     }
     
+    var songCounts: [Song: Int] {
+        viewModel.songs.reduce(into: [:]) { container, song in
+            let count = viewModel.videos.count(where: { $0.songName == song.name })
+            container[song] = count
+        }
+    }
+    
+    var availableSongSet: Set<Song> {
+        Set(availableSongs)
+    }
+    
+    
     var body: some View {
         NavigationStack{
-            HStack {
+            VStack {
+                taggerButtonRow
                 
-                VStack{
-                    Button {
-                        showTaggerSheet = true
-                    } label: {
-                        HStack {
-                            Image(systemName: "tag.fill")
-                            Text("Tagger")
-                        }
-                        .padding()
-                        .contentShape(Rectangle())
-                    }
-                    .sheet(isPresented: $showTaggerSheet) {
-                        VideoTaggerView()
-                    }
-                    
-                    Button {
-                        viewModel.setup()
-                    } label: {
-                        HStack {
-                            Image(systemName: "arrow.clockwise")
-                            Text("Refresh")
-                        }
-                    }
-                }
-                
-                
+                Divider()
                 
                 ScrollView {
                     VStack {
-                        ForEach(availableSongs, id: \.id) { song in
-                            Text(song.name)
+                        ForEach(viewModel.songs, id: \.id) { song in
+                            Text("\(song.name)  \(songQuotas[song.name, default: 0])")
+                                .foregroundStyle(foregroundColor(for: song.name))
                                 .fontWeight(focusedSong?.id == song.id ? .bold : .regular)
                                 .padding(4)
                                 .frame(maxWidth: .infinity)
@@ -94,6 +83,54 @@ struct SongSelectView: View {
         }
         .onAppear {
             focusedSong = viewModel.songs.first
+        }
+    }
+    
+    var taggerButtonRow: some View {
+        HStack{
+            Button {
+                showTaggerSheet = true
+            } label: {
+                HStack {
+                    Image(systemName: "tag.fill")
+                    Text("Tagger")
+                }
+                .padding()
+                .contentShape(Rectangle())
+            }
+            .sheet(isPresented: $showTaggerSheet) {
+                VideoTaggerView()
+            }
+            
+            Button {
+                viewModel.setup()
+            } label: {
+                HStack {
+                    Image(systemName: "arrow.clockwise")
+                    Text("Refresh")
+                }
+            }
+        }
+    }
+    
+    func foregroundColor(for songName: String) -> Color {
+        guard let quota = songQuotas[songName] else {
+            return .primary
+        }
+        
+        guard let song = viewModel.songs.first(where: { $0.name == songName }),
+              let count = songCounts[song] else {
+            return .gray
+        }
+        
+        if count == 0 {
+            return .gray
+        } else if count < quota {
+            return .yellow
+        } else if count > quota {
+            return .orange
+        } else {
+            return .primary
         }
     }
 }

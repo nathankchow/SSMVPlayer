@@ -9,7 +9,6 @@ import SwiftUI
 
 @main
 struct SSMVPlayerApp: App {
-    
     @State private var viewModel = ViewModel()
     
     var body: some Scene {

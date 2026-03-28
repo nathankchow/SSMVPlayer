@@ -8,6 +8,83 @@
 
 import SwiftUI
 
+struct DynamicIdolRowView: View {
+    @Binding var idols: [String]
+    @State var selectedIndex: Int? = nil
+    
+    let idolCount: Int
+    let hasPivotIdol: Bool
+    let order = [4,2,1,3,5]
+    
+    var body: some View {
+        HStack {
+            ForEach(idols.indices, id: \.self) { index in
+                IdolCellView(idol: idols[index])
+                    .opacity(order[index] > idolCount ? 0.5 : 1)
+                    .padding(3)
+                    .overlay(
+                        Rectangle()
+                            .stroke(selectedIndex == index ? Color.red : Color.clear, lineWidth: 3)
+                    )
+                    .overlay(
+                        Group {
+                            if hasPivotIdol && showLock(index: index) {
+                                Image(systemName: "lock.fill")
+                                    .foregroundColor(.white)
+                            }
+                        }
+                    )
+                    .onTapGesture {
+                        tapGestureCallback(index)
+                    }
+            }
+        }
+    }
+    
+    func showLock(index: Int) -> Bool {
+        guard let selected = selectedIndex else { return false }
+        
+        let koharuIndex = idols.firstIndex(of: "koharu")!
+        
+        if idols[selected] == "koharu" {
+            return order[index] > idolCount
+        } else if order[selected] > idolCount {
+            return index == koharuIndex
+        } else {
+            return false
+        }
+    }
+    
+    func tapGestureCallback(_ index: Int) {
+        guard let selected = selectedIndex else {
+            selectedIndex = index
+            return
+        }
+        
+        if hasPivotIdol {
+            let outerPosition = max(order[index], order[selected])
+            if outerPosition > idolCount && (idols[index] == "koharu" || idols[selected]  == "koharu") {
+                selectedIndex = nil
+                return
+            }
+        }
+        
+        var idolsCopy = idols
+        let temp = idolsCopy[index]
+        idolsCopy[index] = idolsCopy[selected]
+        idolsCopy[selected] = temp
+        
+        self.idols = idolsCopy
+        selectedIndex = nil
+    }
+    
+    init(_ idols: Binding<[String]>, hasPivotIdol: Bool, idolCount: Int = 1) {
+        self._idols = idols
+        self.idolCount = idolCount
+        self.hasPivotIdol = hasPivotIdol
+    }
+}
+
 struct StaticIdolRowView: View {
     var idols: [String] = ["","","","",""]
     
