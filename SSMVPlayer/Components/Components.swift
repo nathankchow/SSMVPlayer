@@ -4,7 +4,6 @@
 //
 //  Created by natha on 3/9/26.
 //
-// #TODO: arisu default bad
 
 import SwiftUI
 

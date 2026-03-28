@@ -6,6 +6,8 @@
 //
 // #TODO: Find a way to generate videos dynamically instead of bundled json file
 // #TODO: double check that youtube songs all match, or implement string similarity in case it doesnt
+        // Brand new doesnt work.
+        // lets sail away doesnt work either - might have to do with exclamation marks
 // #TODO: refactor globals into AppConstants enum
 
 let allExistingSongs: [String] = [
@@ -145,6 +147,8 @@ final class ViewModel {
         let relevantVideos = self.videos.filter { $0.songName == song.name }
         if relevantVideos.count == 0 { return false }
         let idolCount = relevantVideos.first!.idols.count
+        if idolCount == 1 { return false }
+        
         if relevantVideos.filter({ video in video.idols.count != idolCount }).count > 0 { return false }
         
         let idolSet = Set(relevantVideos.map { $0.idols })
