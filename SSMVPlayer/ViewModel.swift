@@ -10,11 +10,11 @@
         // lets sail away doesnt work either - might have to do with exclamation marks
 // #TODO: refactor globals into AppConstants enum
 
-let allExistingSongs: [String] = [
+let ALL_EXISTING_SONGS: [String] = [
     "つぼみ", "恋が咲く季節", "夢をのぞいたら（for BEST3 VERSION）", "Brand new!", "Let’s Sail Away!!!", "ダンス・ダンス・ダンス", "Orange Sapphire", "オルゴールの小箱", "認めてくれなくたっていいよ", "ツインテールの風", "躍るFLAGSHIP", "Athanasia", "生存本能ヴァルキュリア", "Love∞Destiny", "クレイジークレイジー", "Pretty Liar", "Starry-Go-Round", "O-Ku-Ri-Mo-No Sunday!", "バベル", "TRUE COLORS", "Gossip Club", "オレンジタイム", "レッド・ソール", "Drastic Melody", "UNIQU3 VOICES!!!", "ジュビリー", "We wish your smile", "Never say never", "ヴィーナスシンドローム", "TOKIMEKIエスカレート", "エヴリデイドリーム", "Bright Blue", "お散歩カメラ", "2nd SIDE", "薄荷 -ハッカ-", "青の一番星", "こいかぜ -花葉-", "One Life", "Last Kiss", "もりのくにから", "Claw My Heart", "14平米にスーベニア", "トキメキは赤くて甘い", "ステップ！", "Frozen Tears", "薄紅", "夕映えプレゼント", "この空の下", "Trancing Pulse", "心もよう", "M@GIC☆", "shabon song"
 ]
 
-let songQuotas: [String: Int] = [
+let SONG_QUOTAS: [String: Int] = [
     "つぼみ": 8,
     "恋が咲く季節": 1,
     "夢をのぞいたら（for BEST3 VERSION）": 36,
@@ -73,44 +73,46 @@ import Algorithms
 import SwiftUI
 import Photos
 
+enum VideoGroupType {
+    case none
+    case full
+    case pivot
+    case select
+}
+
+enum VideoType {
+    case local
+    case youtube
+}
+
+struct SongMetadata {
+    let song: Song
+    let localGroupType: VideoGroupType
+    let youtubeGroupType: VideoGroupType
+    let localIdolCount: Int
+    let youtubeIdolCount: Int
+}
+
 @Observable
 final class ViewModel {
-    var videos: [Video] = []
+    var localVideos: [Video] = []
     var songs: [Song] = []
+    var songMetadataDict: [Song: SongMetadata] = [:]
     var youtubeVideos: [Video] = []
     var pivotIdol = "koharu"
-
-        
+    
     
     private func getAvailableSongs() {
-//        do {
-//            let url = Bundle.main.url(forResource: "songs", withExtension: "json")
-//            // #TODO: dont force unwrap
-//            let data = try Data(contentsOf: url!)
-//            songs = try JSONDecoder().decode([Song].self, from: data)
-//        } catch {
-//            print("something bad happened)")
-//        }
-       songs = allExistingSongs.map { Song(name: $0) }
-    }
-    
-    func getVideoAssets() {
-        let identifiers = videos.map { $0.identifier }
-        let assets = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
-        assets.enumerateObjects { asset, _, _ in
-            if let index = self.videos.firstIndex(where: { $0.identifier == asset.localIdentifier }) {
-                self.videos[index].asset = asset
-            }
-        }
+        songs = ALL_EXISTING_SONGS.map { Song(name: $0) }
     }
     
     private func loadVideoURLs() async {
         let options = PHVideoRequestOptions()
         options.deliveryMode = .automatic
         options.isNetworkAccessAllowed = true
-
+        
         await withTaskGroup(of: (String, AVAsset?).self) { group in
-            for video in videos {
+            for video in localVideos {
                 guard let asset = video.asset else { continue }
                 let identifier = video.identifier
                 
@@ -127,38 +129,22 @@ final class ViewModel {
             }
             
             for await (identifier, avAsset) in group {
-                if let index = self.videos.firstIndex(where: { $0.identifier == identifier }) {
-                    self.videos[index].avAsset = avAsset
-                    self.videos[index].didSuccessfullyLoad = avAsset != nil
+                if let index = self.localVideos.firstIndex(where: { $0.identifier == identifier }) {
+                    self.localVideos[index].avAsset = avAsset
+                    self.localVideos[index].didSuccessfullyLoad = avAsset != nil
                 }
             }
         }
     }
     
-    func checkFullPickerAvailability(_ song: Song) -> Bool {
-        return checkPickerAvailability(song)
-    }
-    
-    func checkPivotPickerAvailability(_ song: Song) -> Bool {
-        return checkPickerAvailability(song, usePivotIdolOnly: true)
-    }
-    
-    func checkPickerAvailability(_ song: Song, usePivotIdolOnly: Bool = false) -> Bool {
-        let relevantVideos = self.videos.filter { $0.songName == song.name }
-        if relevantVideos.count == 0 { return false }
-        let idolCount = relevantVideos.first!.idols.count
-        if idolCount == 1 { return false }
-        
-        if relevantVideos.filter({ video in video.idols.count != idolCount }).count > 0 { return false }
-        
-        let idolSet = Set(relevantVideos.map { $0.idols })
-        let idols = ["arisu", "koharu", "yoshino", "yumi", "yukimi"] // #TODO: need to un-hard code if generalizing 
-        let allPermutations = idols.permutations(ofCount: idolCount).filter { !usePivotIdolOnly || $0.contains(pivotIdol) }
-        for perm in allPermutations {
-            if !idolSet.contains(perm) { return false }
+    private func getLocalVideoAssets() {
+        let identifiers = localVideos.map { $0.identifier }
+        let assets = PHAsset.fetchAssets(withLocalIdentifiers: identifiers, options: nil)
+        assets.enumerateObjects { asset, _, _ in
+            if let index = self.localVideos.firstIndex(where: { $0.identifier == asset.localIdentifier }) {
+                self.localVideos[index].asset = asset
+            }
         }
-        
-        return true
     }
     
     private func loadYoutubeVideos() -> [Video] {
@@ -213,6 +199,60 @@ final class ViewModel {
         }
     }
     
+    private func computeSongMetadata() {
+        for song in songs {
+            let (localGroupType, localIdolCount) = getGroupTypeAndSongCount(song, .local)
+            let (youtubeGroupType, youtubeIdolCount) = getGroupTypeAndSongCount(song, .youtube)
+            songMetadataDict[song] = SongMetadata(song: song, localGroupType: localGroupType, youtubeGroupType: youtubeGroupType, localIdolCount: localIdolCount, youtubeIdolCount: youtubeIdolCount)
+        }
+    }
+    
+    private func getGroupTypeAndSongCount(_ song: Song, _ videoType: VideoType) -> (VideoGroupType, Int){
+        let relevantVideos: [Video]
+        if videoType == .local {
+            relevantVideos = self.localVideos.filter { $0.songName == song.name }
+        } else {
+            relevantVideos = self.youtubeVideos.filter { $0.songName == song.name }
+        }
+        guard let firstVideo = relevantVideos.first else { return (.none, 1) }
+        let idolCount = firstVideo.idols.count
+        if checkFullPickerAvailability(song, relevantVideos, idolCount) { return (.full, idolCount) }
+        else if checkPivotPickerAvailability(song, relevantVideos, idolCount) {
+            return (.pivot, idolCount)
+        } else {
+            return (.select, idolCount)
+        }
+    }
+    
+
+    
+    func checkFullPickerAvailability(_ song: Song, _ videos: [Video], _ idolCount: Int) -> Bool {
+        return checkPickerAvailability(song, videos, idolCount)
+    }
+    
+    func checkPivotPickerAvailability(_ song: Song, _ videos: [Video], _ idolCount: Int) -> Bool {
+        return checkPickerAvailability(song, videos, idolCount, usePivotIdolOnly: true)
+    }
+    
+    func checkPickerAvailability(_ song: Song, _ videos: [Video], _ idolCount: Int,  usePivotIdolOnly: Bool = false) -> Bool {
+        let relevantVideos = videos
+        
+        if relevantVideos.filter({ video in video.idols.count != idolCount }).count > 0 { return false }
+        
+        let idolSet = Set(relevantVideos.map { $0.idols })
+        let idols = ["arisu", "koharu", "yoshino", "yumi", "yukimi"] // #TODO: need to un-hard code if generalizing 
+        let allPermutations = idols.permutations(ofCount: idolCount).filter { !usePivotIdolOnly || $0.contains(pivotIdol) }
+        for perm in allPermutations {
+            if !idolSet.contains(perm) { return false }
+        }
+        
+        return true
+    }
+    
+
+    
+
+    
     private func loadVideosFromJSON() {
         struct VideoData: Codable {
             let songPersistentID: String
@@ -227,7 +267,7 @@ final class ViewModel {
         do {
             let data = try Data(contentsOf: AlbumVideosView.exportFileURL)
             let videosData = try JSONDecoder().decode([VideoData].self, from: data)
-            videos = videosData.map { $0.toVideo() }
+            localVideos = videosData.map { $0.toVideo() }
         } catch {
             print("Failed to load videos.json: \(error)")
         }
@@ -237,8 +277,9 @@ final class ViewModel {
         getAvailableSongs()
         loadVideosFromJSON()
         youtubeVideos = loadYoutubeVideos()
+        computeSongMetadata()
         Task {
-            getVideoAssets()
+            getLocalVideoAssets()
             await loadVideoURLs()
         }
     }
@@ -249,12 +290,13 @@ final class ViewModel {
 }
 
 
-struct Video {
+struct Video: Identifiable {
     let id: UUID = UUID()
     var asset: PHAsset? = nil
     var avAsset: AVAsset? = nil
     let identifier: String
     let songName: String
+    let song: Song? = nil
     let idols: [String]
     var isFavorite: Bool = false
     var didSuccessfullyLoad = false

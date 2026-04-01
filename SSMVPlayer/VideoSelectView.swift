@@ -4,9 +4,8 @@
 //
 //  Created by natha on 3/9/26.
 //
-// #TODO: force lock horizontal in video
-// #TODO: heavy temporary logic to test youtube videos - need to undo/revise
 // #TODO: logic for idolCount for youtube videos not right
+// #TODO: only need one state var for video to play
 
 import AVKit
 import SwiftUI
@@ -14,77 +13,70 @@ import YouTubePlayerKit
 
 struct VideoSelectView: View {
     @Environment(ViewModel.self) private var viewModel
-    @State private var showVideoOverlay: Bool = false
-    @State private var showYoutubeOverlay: Bool = false
+    @State private var localVideoToPlay: Video? = nil
+    @State private var youtubeVideoToPlay: Video? = nil
     @State var selectedIdols: [String] = ["yumi", "arisu", "koharu", "yukimi", "yoshino"] //only applies to full/pivot row selector
     @State var focusedVideo: Video? //only applies to static row selector
-    
-    var videoToPlay: Video? {
-        if canUsePivotSelector {
-            return songVideos.first { $0.idols == selectedActiveIdols }
-        } else if canUseFullSelector && !forceDisableFullSelector{
-            return viewModel.youtubeVideos.first{ $0.idols == selectedActiveIdols && $0.songName == song.name}
-        } else {
-            return focusedVideo
-        }
-    }
-    
+    @State var useYoutubeVideos = false
+
+   
     let song: Song
+    let songMetadata: SongMetadata
+    
+
     
     var songVideos: [Video] {
-        viewModel.videos.filter{
-            $0.songName == song.name
+        if !useYoutubeVideos {
+            viewModel.localVideos.filter{
+                $0.songName == song.name
+            }
+            .sorted(by: { $0.idols.joined(separator: "") < $1.idols.joined(separator: "") })
+        } else {
+            viewModel.youtubeVideos.filter{
+                $0.songName == song.name
+            }
+            .sorted(by: { $0.idols.joined(separator: "") < $1.idols.joined(separator: "") })
         }
-        .sorted(by: { $0.idols.joined(separator: "") < $1.idols.joined(separator: "") })
     }
     
-//    var canUseFullSelector: Bool {
-//        return viewModel.checkFullPickerAvailability(song)
-//    }
-    
-    var canUseFullSelector: Bool {
-        return viewModel.youtubeVideos.map{ $0.songName }.contains(song.name)
+    var groupType: VideoGroupType {
+        useYoutubeVideos ? songMetadata.youtubeGroupType : songMetadata.localGroupType
     }
     
-    var canUsePivotSelector: Bool {
-        return viewModel.checkPivotPickerAvailability(song)
+    var idolCount: Int {
+        useYoutubeVideos ? songMetadata.youtubeIdolCount : songMetadata.localIdolCount
     }
-    
-    @State var forceDisableFullSelector = true
     
     var selectedActiveIdols: [String] {
-        let idolCount: Int
-        if canUsePivotSelector || !canUseFullSelector || forceDisableFullSelector{
-            idolCount = songVideos.first?.idols.count ?? 1
-        } else {
-            idolCount = viewModel.youtubeVideos.filter({$0.songName == song.name}).first?.idols.count ?? 1
-        }
         let order = [4,2,1,3,5]
         return selectedIdols.indices
             .filter { order[$0] <= idolCount }
             .map { selectedIdols[$0] }
     }
+
     
     var body: some View {
         Group {
             VStack {
-                Toggle("Disable Full Selector", isOn: $forceDisableFullSelector)
+                Toggle("Use Youtube Videos", isOn: $useYoutubeVideos)
                     .padding(.horizontal)
-                if canUsePivotSelector {
-                    DynamicIdolRowView($selectedIdols, hasPivotIdol: true, idolCount: songVideos.first?.idols.count ?? 1)
-                } else if canUseFullSelector && !forceDisableFullSelector {
-                    DynamicIdolRowView($selectedIdols, hasPivotIdol: false, idolCount: songVideos.first?.idols.count ?? 1)
-                } else {
+                
+                if groupType == .none {
+                    EmptyView()
+                } else if groupType == .select {
                     listIdolSelector
+                } else {
+                    DynamicIdolRowView($selectedIdols, hasPivotIdol: groupType == .pivot, idolCount: idolCount)
                 }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottomTrailing) {
             Button {
-                if canUsePivotSelector || !canUseFullSelector || forceDisableFullSelector
-                { showVideoOverlay = true }
-                else { showYoutubeOverlay = true }
+                if groupType == .none { return }
+                
+                if !useYoutubeVideos { localVideoToPlay = getLocalVideoToPlay() }
+                else { youtubeVideoToPlay = getYoutubeVideoToPlay() }
             } label: {
                 Text("Play")
                     .foregroundStyle(.white)
@@ -93,14 +85,15 @@ struct VideoSelectView: View {
                     .clipShape(Capsule())
                     .padding()
             }
+            .disabled(groupType == .none)
         }
         .navigationTitle(song.name)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             focusedVideo = songVideos.first ?? nil
         }
-        .sheet(isPresented: $showVideoOverlay) {
-            if let avAsset = videoToPlay?.avAsset {
+        .sheet(item: $localVideoToPlay) { video in
+            if let avAsset = video.avAsset {
                 let playerItem = AVPlayerItem(asset: avAsset)
                 let player = AVPlayer(playerItem: playerItem)
                 VideoPlayer(player: player)
@@ -110,8 +103,8 @@ struct VideoSelectView: View {
                     }
             }
         }
-        .sheet(isPresented: $showYoutubeOverlay) {
-            YouTubePlayerView(YouTubePlayer(stringLiteral: videoToPlay?.youtubeURL ?? ""))
+        .sheet(item: $youtubeVideoToPlay) { video in
+            YouTubePlayerView(YouTubePlayer(stringLiteral: video.youtubeURL ?? ""))
                 .ignoresSafeArea()
         }
     }
@@ -131,9 +124,38 @@ struct VideoSelectView: View {
             }
         }
     }
+    
+    func getLocalVideoToPlay() -> Video? {
+        switch groupType {
+        case .none:
+            return nil
+        case .select:
+            return focusedVideo
+        default:
+            return viewModel.localVideos.first{ $0.idols == selectedActiveIdols && $0.songName == song.name}
+        }
+    }
+        
+    func getYoutubeVideoToPlay() -> Video? {
+        switch groupType {
+        case .none:
+            return nil
+        case .select:
+            return focusedVideo
+        default:
+            return viewModel.youtubeVideos.first{ $0.idols == selectedActiveIdols && $0.songName == song.name}
+        }
+    }
+    
+    
+    init(song: Song, metadata: SongMetadata) {
+        self.song = song
+        self.songMetadata = metadata
+    }
 }
+        
 
-#Preview {
-    VideoSelectView(song: Song(name: "Pretty Liar"))
-        .environment(ViewModel())
-}
+//#Preview {
+//    VideoSelectView(song: Song(name: "Pretty Liar"))
+//        .environment(ViewModel())
+//}

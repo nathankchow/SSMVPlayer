@@ -89,7 +89,7 @@ struct SongName: Decodable {
 }
 
 enum SongNameList {
-    static let songs: [SongName] = allExistingSongs.map{ SongName(name: $0) }
+    static let songs: [SongName] = ALL_EXISTING_SONGS.map{ SongName(name: $0) }
     static let names: [String] = songs.map(\.name)
 }
 

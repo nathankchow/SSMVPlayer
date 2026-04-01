@@ -15,13 +15,13 @@ struct SongSelectView: View {
     
     var availableSongs: [Song] {
         viewModel.songs.filter { song in
-            viewModel.videos.map { $0.songName }.contains(song.name)
+            viewModel.localVideos.map { $0.songName }.contains(song.name)
         }
     }
     
     var songCounts: [Song: Int] {
         viewModel.songs.reduce(into: [:]) { container, song in
-            let count = viewModel.videos.count(where: { $0.songName == song.name })
+            let count = viewModel.localVideos.count(where: { $0.songName == song.name })
             container[song] = count
         }
     }
@@ -41,7 +41,7 @@ struct SongSelectView: View {
                 ScrollView {
                     VStack {
                         ForEach(viewModel.songs, id: \.id) { song in
-                            Text("\(song.name)  \(songQuotas[song.name, default: 0])")
+                            Text("\(song.name)  \(SONG_QUOTAS[song.name, default: 0])")
                                 .foregroundStyle(foregroundColor(for: song.name))
                                 .fontWeight(focusedSong?.id == song.id ? .bold : .regular)
                                 .padding(4)
@@ -69,7 +69,7 @@ struct SongSelectView: View {
                             .frame(width: 250, height: 250)
                     }
                     
-                    NavigationLink(destination: VideoSelectView(song: focusedSong ?? viewModel.songs.first!)) {
+                    NavigationLink(destination: VideoSelectView(song: focusedSong ?? viewModel.songs.first!, metadata:  viewModel.songMetadataDict[focusedSong ?? viewModel.songs.first!]!)) {
                         Text("Play")
                             .foregroundStyle(.white)
                             .frame(width: 250, height: 50)
@@ -114,7 +114,7 @@ struct SongSelectView: View {
     }
     
     func foregroundColor(for songName: String) -> Color {
-        guard let quota = songQuotas[songName] else {
+        guard let quota = SONG_QUOTAS[songName] else {
             return .primary
         }
         
