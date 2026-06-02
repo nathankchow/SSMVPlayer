@@ -86,35 +86,42 @@ struct DynamicIdolRowView: View {
 
 struct StaticIdolRowView: View {
     var idols: [String] = ["","","","",""]
+    let idolCellSize: CGFloat
     
     var body: some View {
         HStack {
             ForEach(idols.indices, id: \.self) { index in
-                IdolCellView(idol: idols[index])
+                IdolCellView(idol: idols[index], size: idolCellSize)
             }
         }
     }
     
-    init(_ inputIdols: [String]) {
+    init(_ inputIdols: [String], idolCellSize: CGFloat = 70) {
         let idolCount = inputIdols.count
+        self.idolCellSize = idolCellSize
         var currentIndex = 2 - (idolCount / 2) //2, 1, 1, 0, 0
         for idol in inputIdols {
             idols[currentIndex] = idol
             currentIndex += 1
         }
     }
+    
+    init(_ video: Video?, idolCellSize: CGFloat = 70) {
+        self.init(video?.idols ?? [], idolCellSize: idolCellSize)
+    }
 }
 
 // #TODO: probably want to name the images differently
 struct IdolCellView: View {
     let idol: String
+    let size: CGFloat
     
     var body: some View {
         if idol == "" {
             Image(systemName: "sparkles")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 70, height: 70)
+                .frame(width: size, height: size)
                 .foregroundStyle(Color.gray.opacity(0.6))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .overlay(
@@ -125,8 +132,13 @@ struct IdolCellView: View {
             Image("\(idol)-default")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 70, height: 70)
+                .frame(width: size, height: size)
         }
+    }
+    
+    init(idol: String, size: CGFloat = 70) {
+        self.idol = idol
+        self.size = size
     }
 }
 

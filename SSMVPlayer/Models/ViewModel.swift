@@ -10,8 +10,70 @@
         // lets sail away doesnt work either - might have to do with exclamation marks
 // #TODO: refactor globals into AppConstants enum
 
-let ALL_EXISTING_SONGS: [String] = [
-    "つぼみ", "恋が咲く季節", "夢をのぞいたら（for BEST3 VERSION）", "Brand new!", "Let’s Sail Away!!!", "ダンス・ダンス・ダンス", "Orange Sapphire", "オルゴールの小箱", "認めてくれなくたっていいよ", "ツインテールの風", "躍るFLAGSHIP", "Athanasia", "生存本能ヴァルキュリア", "Love∞Destiny", "クレイジークレイジー", "Pretty Liar", "Starry-Go-Round", "O-Ku-Ri-Mo-No Sunday!", "バベル", "TRUE COLORS", "Gossip Club", "オレンジタイム", "レッド・ソール", "Drastic Melody", "UNIQU3 VOICES!!!", "ジュビリー", "We wish your smile", "Never say never", "ヴィーナスシンドローム", "TOKIMEKIエスカレート", "エヴリデイドリーム", "Bright Blue", "お散歩カメラ", "2nd SIDE", "薄荷 -ハッカ-", "青の一番星", "こいかぜ -花葉-", "One Life", "Last Kiss", "もりのくにから", "Claw My Heart", "14平米にスーベニア", "トキメキは赤くて甘い", "ステップ！", "Frozen Tears", "薄紅", "夕映えプレゼント", "この空の下", "Trancing Pulse", "心もよう", "M@GIC☆", "shabon song"
+let ALL_EXISTING_SONGS: [String] =  [
+    "つぼみ",
+    "恋が咲く季節",
+    "夢をのぞいたら（for BEST3 VERSION）",
+    "Brand new!",
+    "Never ends",
+    "Let’s Sail Away!!!",
+    "VOY@GER",
+    "ダンス・ダンス・ダンス",
+    "Orange Sapphire",
+    "オルゴールの小箱",
+    "認めてくれなくたっていいよ",
+    "ツインテールの風",
+    "とんでいっちゃいたいの",
+    "躍るFLAGSHIP",
+    "Athanasia",
+    "印象",
+    "イケナイGO AHEAD",
+    "生存本能ヴァルキュリア",
+    "Love∞Destiny",
+    "クレイジークレイジー",
+    "Pretty Liar",
+    "Starry-Go-Round",
+    "O-Ku-Ri-Mo-No Sunday!",
+    "無重力シャトル",
+    "バベル",
+    "TRUE COLORS",
+    "Gossip Club",
+    "幸せの法則 ～ルール～",
+    "オレンジタイム",
+    "Secret Mirage",
+    "レッド・ソール",
+    "Drastic Melody",
+    "UNIQU3 VOICES!!!",
+    "ジュビリー",
+    "We wish your smile",
+    "Never say never",
+    "ヴィーナスシンドローム",
+    "TOKIMEKIエスカレート",
+    "エヴリデイドリーム",
+    "Bright Blue",
+    "お散歩カメラ",
+    "2nd SIDE",
+    "薄荷 -ハッカ-",
+    "青の一番星",
+    "こいかぜ -花葉-",
+    "One Life",
+    "Last Kiss",
+    "もりのくにから",
+    "Claw My Heart",
+    "14平米にスーベニア",
+    "トキメキは赤くて甘い",
+    "ステップ！",
+    "Frozen Tears",
+    "薄紅",
+    "夕映えプレゼント",
+    "Memories",
+    "この空の下",
+    "Trancing Pulse",
+    "心もよう",
+    "M@GIC☆",
+    "shabon song",
+    "ささのはに、うたかたに。",
+    "サマーサイダー"
 ]
 
 let SONG_QUOTAS: [String: Int] = [
@@ -100,7 +162,7 @@ final class ViewModel {
     var songMetadataDict: [Song: SongMetadata] = [:]
     var youtubeVideos: [Video] = []
     var pivotIdol = "koharu"
-    
+    var playlists: [Playlist] = []
     
     private func getAvailableSongs() {
         songs = ALL_EXISTING_SONGS.map { Song(name: $0) }
@@ -108,7 +170,9 @@ final class ViewModel {
     
     private func loadVideoURLs() async {
         let options = PHVideoRequestOptions()
+// #TODO: what does this do?
         options.deliveryMode = .automatic
+// #TODO:  why would network access be allowed?
         options.isNetworkAccessAllowed = true
         
         await withTaskGroup(of: (String, AVAsset?).self) { group in
@@ -186,7 +250,8 @@ final class ViewModel {
                 }
             }
             
-            let songName = songTokens.joined(separator: " ")
+            var songName = songTokens.joined(separator: " ")
+            songName = getExistingSongName(songName)
             let youtubeURL = "https://www.youtube.com/watch?v=\(youtubeID)"
             
             return Video(
@@ -197,6 +262,43 @@ final class ViewModel {
                 youtubeURL: youtubeURL
             )
         }
+    }
+    
+    ///Checks ALL_EXISTING_SONGS for this song name. If it doesn't exist, use string distance to get the closest thing.
+    private func getExistingSongName(_ songName: String) -> String {
+        if ALL_EXISTING_SONGS.contains(songName) { return songName }
+
+        func levenshteinDistance(_ a: String, _ b: String) -> Int {
+            let a = Array(a), b = Array(b)
+            var dp = Array(0...b.count)
+
+            for i in 1...max(a.count, 1) {
+                guard i <= a.count else { break }
+                var prev = dp[0]
+                dp[0] = i
+                for j in 1...max(b.count, 1) {
+                    guard j <= b.count else { break }
+                    let temp = dp[j]
+                    dp[j] = a[i-1] == b[j-1] ? prev : min(prev, min(dp[j], dp[j-1])) + 1
+                    prev = temp
+                }
+            }
+
+            return dp[b.count]
+        }
+
+        var bestDistance: Int = Int.max
+        var bestMatch: String = ALL_EXISTING_SONGS.first ?? songName
+
+        for nameCandidate in ALL_EXISTING_SONGS {
+            let distance = levenshteinDistance(songName.lowercased(), nameCandidate.lowercased())
+            if distance < bestDistance {
+                bestDistance = distance
+                bestMatch = nameCandidate
+            }
+        }
+
+        return bestMatch
     }
     
     private func computeSongMetadata() {
@@ -251,8 +353,6 @@ final class ViewModel {
     
 
     
-
-    
     private func loadVideosFromJSON() {
         struct VideoData: Codable {
             let songPersistentID: String
@@ -296,7 +396,7 @@ struct Video: Identifiable {
     var avAsset: AVAsset? = nil
     let identifier: String
     let songName: String
-    let song: Song? = nil
+    //let song: Song? = nil
     let idols: [String]
     var isFavorite: Bool = false
     var didSuccessfullyLoad = false
@@ -312,3 +412,5 @@ struct Song: Codable, Hashable {
         case name
     }
 }
+
+

@@ -13,15 +13,26 @@ import YouTubePlayerKit
 
 struct VideoSelectView: View {
     @Environment(ViewModel.self) private var viewModel
+    @Environment(\.dismiss) private var dismiss
     @State private var localVideoToPlay: Video? = nil
     @State private var youtubeVideoToPlay: Video? = nil
     @State var selectedIdols: [String] = ["yumi", "arisu", "koharu", "yukimi", "yoshino"] //only applies to full/pivot row selector
     @State var focusedVideo: Video? //only applies to static row selector
     @State var useYoutubeVideos = false
 
-   
+    
     let song: Song
     let songMetadata: SongMetadata
+    let playlist: Playlist?
+    let playlistEntryIndex: Int
+    
+    var isPlaylistContext: Bool {
+        playlist != nil
+    }
+    
+    var confirmButtonLabel: String {
+        isPlaylistContext ? "Set idols" : "Play"
+    }
     
 
     
@@ -58,11 +69,12 @@ struct VideoSelectView: View {
     var body: some View {
         Group {
             VStack {
-                Toggle("Use Youtube Videos", isOn: $useYoutubeVideos)
+                Toggle("Use youtube videos", isOn: $useYoutubeVideos)
                     .padding(.horizontal)
                 
                 if groupType == .none {
-                    EmptyView()
+                    Text("No videos available")
+                        .fontWeight(.bold)
                 } else if groupType == .select {
                     listIdolSelector
                 } else {
@@ -73,12 +85,21 @@ struct VideoSelectView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .overlay(alignment: .bottomTrailing) {
             Button {
-                if groupType == .none { return }
-                
-                if !useYoutubeVideos { localVideoToPlay = getLocalVideoToPlay() }
-                else { youtubeVideoToPlay = getYoutubeVideoToPlay() }
+                if isPlaylistContext {
+                    let video = useYoutubeVideos ? getYoutubeVideoToPlay() : getLocalVideoToPlay()
+                    guard let video = video else {
+                        dismiss()
+                        return
+                    }
+                    playlist?.entries[playlistEntryIndex].video = video
+                    dismiss()
+                } else {
+                    if groupType == .none { return }
+                    if !useYoutubeVideos { localVideoToPlay = getLocalVideoToPlay() }
+                    else { youtubeVideoToPlay = getYoutubeVideoToPlay() }
+                }
             } label: {
-                Text("Play")
+                Text(confirmButtonLabel)
                     .foregroundStyle(.white)
                     .frame(width: 160, height: 40)
                     .background(.pink)
@@ -91,6 +112,11 @@ struct VideoSelectView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             focusedVideo = songVideos.first ?? nil
+            if songMetadata.youtubeGroupType == .none {
+                useYoutubeVideos = false
+            } else if songMetadata.localGroupType == .none {
+                useYoutubeVideos = true
+            }
         }
         .sheet(item: $localVideoToPlay) { video in
             if let avAsset = video.avAsset {
@@ -106,6 +132,7 @@ struct VideoSelectView: View {
         .sheet(item: $youtubeVideoToPlay) { video in
             YouTubePlayerView(YouTubePlayer(stringLiteral: video.youtubeURL ?? ""))
                 .ignoresSafeArea()
+//            TestYoutubePlayerView(video.youtubeURL ?? "")
         }
     }
     
@@ -124,6 +151,8 @@ struct VideoSelectView: View {
             }
         }
     }
+    
+    
     
     func getLocalVideoToPlay() -> Video? {
         switch groupType {
@@ -148,9 +177,11 @@ struct VideoSelectView: View {
     }
     
     
-    init(song: Song, metadata: SongMetadata) {
+    init(song: Song, metadata: SongMetadata, playlist: Playlist? = nil, playlistEntryIndex: Int = 0) {
         self.song = song
         self.songMetadata = metadata
+        self.playlist = playlist
+        self.playlistEntryIndex = playlistEntryIndex
     }
 }
         

@@ -13,8 +13,10 @@ struct SSMVPlayerApp: App {
     
     var body: some Scene {
         WindowGroup {
-            SongSelectView()
-                .environment(viewModel)
+            NavigationStack {
+                SongSelectView()
+            }
+            .environment(viewModel)
         }
     }
 }
