@@ -10,7 +10,7 @@ import Foundation
 
 
 @Observable
-class Playlist: Hashable, Equatable {
+class Playlist: Hashable, Equatable, Identifiable {
     let id = UUID()
     var entries: [PlaylistEntry] = []
     var name: String
@@ -67,25 +67,27 @@ struct PlaylistEntry {
 @Observable
 class PlaybackQueue {
     var playlist: Playlist
+    var videos: [Video]
     var index: Int = 0
 
-    var currentEntry: PlaylistEntry? {
-        guard playlist.entries.indices.contains(index) else { return nil }
-        return playlist.entries[index]
+    var currentVideo: Video? {
+        guard self.videos.indices.contains(index) else { return nil }
+        return self.videos[index]
     }
     
-    var nextEntry: PlaylistEntry? {
-        guard playlist.entries.indices.contains(index+1) else { return nil }
-        return playlist.entries[index+1]
+    var nextVideo: Video? {
+        guard self.videos.indices.contains(index+1) else { return nil }
+        return self.videos[index+1]
     }
     
     func increaseIndex() {
-        if let _ = nextEntry {
+        if let _ = nextVideo {
             index += 1
         }
     }
     
     init(_ playlist: Playlist) {
         self.playlist = playlist
+        self.videos = playlist.entries.compactMap{ $0.video }
     }
 }

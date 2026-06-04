@@ -5,6 +5,7 @@
 //  Created by natha on 5/21/26.
 //
 // #TODO: how to get rid of rounded corners for a list?
+// #TODO: enum/index based foreach is making reorder laggy/slow?
 
 import SwiftUI
 
@@ -12,13 +13,13 @@ struct PlaylistEditView: View {
     @Environment(ViewModel.self) private var viewModel
     let playlist: Playlist
     @State var showAlert = false
+    @State private var playlistToPlay: Playlist? = nil
     
     var videos: [Video] {
         playlist.entries.compactMap(\.video)
     }
     
     var body: some View {
-        Group {
             List {
                 Section {
                     NavigationLink(destination: PlaylistSongSelectView(playlist: playlist)){
@@ -41,6 +42,7 @@ struct PlaylistEditView: View {
                                     .scaledToFit()
                                     .frame(width: 75, height: 75)
                             }
+                            .disabled(entry.video == nil)
                             
                             VStack(alignment: .leading) {
                                 Text(entry.song.name)
@@ -52,6 +54,7 @@ struct PlaylistEditView: View {
                                 }
                             }
                         }
+                        .buttonStyle(.borderless)
                     }
                     .onMove(perform: move)
                     .onDelete(perform: delete)
@@ -60,7 +63,10 @@ struct PlaylistEditView: View {
             .toolbar {
                 EditButton()
             }
-        }
+            .sheet(item: $playlistToPlay) { p in
+                PlaylistPlayerView(playlist: p)
+            }
+
         .overlay(alignment: .bottomTrailing) {
             Button {
                 playPlaylist(from: 0)
@@ -72,7 +78,7 @@ struct PlaylistEditView: View {
                         .clipShape(Capsule())
                         .padding()
             }
-            .disabled(playlist.entries.isEmpty)
+            .disabled(playlist.entries.isEmpty || playlist.entries.filter{ $0.video == nil }.count > 0)
         }
     }
     
@@ -85,7 +91,7 @@ struct PlaylistEditView: View {
     }
     
     func playPlaylist(from index: Int) {
-        // #TODO: implement playlist player
+        playlistToPlay = playlist
     }
 }
 

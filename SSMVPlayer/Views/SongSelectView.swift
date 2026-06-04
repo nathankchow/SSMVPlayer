@@ -145,7 +145,8 @@ struct SongSelectView: View {
                     }
                 }
                 .sheet(isPresented: $showTestPlaylistSheet) {
-                    TestYoutubePlayerView(Playlist.samplePlaylist())
+//                    TestYoutubePlayerView(Playlist.samplePlaylist())
+                    EmptyView()
                 }
             }
         }
