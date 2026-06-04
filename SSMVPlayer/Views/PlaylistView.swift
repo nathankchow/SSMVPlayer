@@ -16,7 +16,7 @@ struct PlaylistCreateView: View {
             Section {
                 Button {
                     // #TODO: make name unique/dynamic
-                    let playlist = Playlist(name: "New Playlist")
+                    let playlist = Playlist(name: "Untitled Playlist")
                     viewModel.playlists.append(playlist)
                     newPlaylist = playlist
                 } label: {

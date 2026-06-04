@@ -5,7 +5,8 @@
 //  Created by natha on 5/21/26.
 //
 // #TODO: how to get rid of rounded corners for a list?
-// #TODO: enum/index based foreach is making reorder laggy/slow?
+// #TODO: implement positional playing
+// #TODO: think about nuance of multiple buttons in an list element
 
 import SwiftUI
 
@@ -17,6 +18,10 @@ struct PlaylistEditView: View {
     
     var videos: [Video] {
         playlist.entries.compactMap(\.video)
+    }
+    
+    var isPlayable: Bool {
+        !(playlist.entries.isEmpty || playlist.entries.filter{ $0.video == nil }.count > 0)
     }
     
     var body: some View {
@@ -32,7 +37,8 @@ struct PlaylistEditView: View {
                 }
                 
                 Section {
-                    ForEach(Array(zip(playlist.entries.indices, playlist.entries)), id: \.0) { index, entry in
+                    ForEach(playlist.entries, id: \.id) { entry in
+                        let index = playlist.entries.firstIndex(where: { $0.id == entry.id })!
                         HStack {
                             Button {
                                 playPlaylist(from: index)
@@ -76,9 +82,10 @@ struct PlaylistEditView: View {
                         .frame(width: 160, height: 40)
                         .background(.pink)
                         .clipShape(Capsule())
+                        .opacity(isPlayable ? 1.0 : 0.45)
                         .padding()
             }
-            .disabled(playlist.entries.isEmpty || playlist.entries.filter{ $0.video == nil }.count > 0)
+            .disabled(!isPlayable)
         }
     }
     

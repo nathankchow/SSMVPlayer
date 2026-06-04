@@ -13,14 +13,23 @@ struct PlaylistSongSelectView: View {
     
     @State var songsToAdd: [Song] = []
     @State private var horizontalPosition: ScrollPosition = .init(idType: Int.self)
-
+    @State var filterIdolCount = -1
+    
+    var filterIdolCountChoices = [-1,5,4,3,2,1]
+    
     let playlist: Playlist
     
     var availableSongs: [Song] {
         // #TODO: is songmetadatadict all songs or only songs with non-zero vid count?
-        viewModel.songs.filter {
+        var filtered = viewModel.songs.filter {
             viewModel.songMetadataDict.keys.contains($0)
         }
+        
+        if filterIdolCount != -1 {
+            filtered = filtered.filter{viewModel.songMetadataDict[$0]?.canonicalIdolCount ?? -1 == filterIdolCount}
+        }
+        
+        return filtered
     }
     
     // #TODO: look into how grid columns work exactly
@@ -31,6 +40,40 @@ struct PlaylistSongSelectView: View {
     
     var body: some View {
         VStack(spacing: 0) {
+//            HStack {
+//                HStack {
+//                    Image(systemName: "person.fill")
+//                    
+//                    Text("Any")
+//                }
+//            }
+            
+            HStack{
+                Picker("", selection: $filterIdolCount, content: {
+                    HStack{
+                        Text("Any")
+                        Image(systemName: "person.fill")
+                    }.tag(-1)
+                    ForEach((1...5).reversed(), id: \.self) {i in
+                        HStack{
+                            Text("\(i)")
+                            Image(systemName: "person.fill")
+                            Text("wtf")
+                        }.tag(i)
+                    }
+                })
+                .pickerStyle(.menu)
+                
+                Button("Reset") {
+                    filterIdolCount = -1
+                }
+            }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(.background.secondary)
+            
+            Divider()
+            
             ScrollView {
                 LazyVGrid(columns: gridColumns, spacing: 10) {
                     ForEach(availableSongs, id: \.self) { song in
@@ -55,42 +98,46 @@ struct PlaylistSongSelectView: View {
             
             Divider()
             
-            ScrollView(.horizontal) {
-                HStack {
-                    ForEach(Array(zip(songsToAdd.indices, songsToAdd)), id: \.0) { index, item in
-                        
-                        Image(songsToAdd[index].name)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 75, height: 75)
-                            .overlay(alignment: .topTrailing) {
-                                Button {
-                                    songsToAdd.remove(at: index)
-                                } label: {
-                                    Image(systemName: "minus.circle")
-                                        .foregroundStyle(.red)
-                                        .background(.white)
+            VStack {
+                ScrollView(.horizontal) {
+                    HStack {
+                        ForEach(Array(zip(songsToAdd.indices, songsToAdd)), id: \.0) { index, item in
+                            
+                            Image(songsToAdd[index].name)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 75, height: 75)
+                                .overlay(alignment: .topTrailing) {
+                                    Button {
+                                        songsToAdd.remove(at: index)
+                                    } label: {
+                                        Image(systemName: "minus.circle")
+                                            .foregroundStyle(.red)
+                                            .background(.white)
+                                    }
                                 }
-                            }
+                        }
                     }
+                    .scrollTargetLayout()
+                    .padding()
                 }
-                .scrollTargetLayout()
-                .padding()
-            }
-            .scrollPosition($horizontalPosition)
-            
-            Button {
-                for song in songsToAdd {
-                    playlist.entries.append(PlaylistEntry(song: song))
+                .scrollPosition($horizontalPosition)
+                
+                
+                Button {
+                    for song in songsToAdd {
+                        playlist.entries.append(PlaylistEntry(song: song))
+                    }
+                    dismiss()
+                } label: {
+                    Text("Confirm")
+                        .foregroundStyle(.white)
+                        .frame(width: 200, height: 40)
+                        .background(.blue)
+                        .clipShape(.capsule)
                 }
-                dismiss()
-            } label: {
-                Text("Confirm")
-                    .foregroundStyle(.white)
-                    .frame(width: 200, height: 40)
-                    .background(.blue)
-                    .clipShape(.capsule)
             }
+            .background(.background.secondary)
         }
     }
 }

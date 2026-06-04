@@ -6,6 +6,7 @@
 //
 // #TODO: logic for idolCount for youtube videos not right
 // #TODO: only need one state var for video to play
+// #TODO: bring the selector up to the top of the screen for selector grouping
 
 import AVKit
 import SwiftUI

@@ -3,8 +3,7 @@
 //  SSMVPlayer
 //
 //  Created by natha on 3/8/26.
-//
-// todo
+// #TODO: view is ugly
 
 import SwiftUI
 
