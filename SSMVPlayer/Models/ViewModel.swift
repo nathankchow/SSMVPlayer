@@ -186,7 +186,6 @@ final class ViewModel {
     
     private func computeSongMetadata() {
         let staticDict = loadSongStaticMetadata()
-        print(staticDict)
         
         for song in songs {
             let (localGroupType, localIdolCount) = getGroupTypeAndSongCount(song, .local)
@@ -212,7 +211,7 @@ final class ViewModel {
         } else {
             relevantVideos = self.youtubeVideos.filter { $0.songName == song.name }
         }
-        guard let firstVideo = relevantVideos.first else { return (.none, 1) }
+        guard let firstVideo = relevantVideos.first else { return (.none, 0) }
         let idolCount = firstVideo.idols.count
         if checkFullPickerAvailability(song, relevantVideos, idolCount) { return (.full, idolCount) }
         else if checkPivotPickerAvailability(song, relevantVideos, idolCount) {
@@ -288,6 +287,7 @@ final class ViewModel {
         loadVideosFromJSON()
         youtubeVideos = loadYoutubeVideos()
         computeSongMetadata()
+        print(self.songMetadataDict)
         Task {
             getLocalVideoAssets()
             await loadVideoURLs()
