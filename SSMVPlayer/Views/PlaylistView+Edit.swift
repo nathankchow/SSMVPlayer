@@ -66,6 +66,8 @@ struct PlaylistEditView: View {
                     .onDelete(perform: delete)
                 }
             }
+            .navigationTitle(playlist.name)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 EditButton()
             }
@@ -80,9 +82,8 @@ struct PlaylistEditView: View {
                     Text("Play")
                         .foregroundStyle(.white)
                         .frame(width: 160, height: 40)
-                        .background(.pink)
+                        .background(isPlayable ? .pink : .gray)
                         .clipShape(Capsule())
-                        .opacity(isPlayable ? 1.0 : 0.45)
                         .padding()
             }
             .disabled(!isPlayable)

@@ -5,6 +5,7 @@
 //  Created by natha on 6/4/26.
 // #TODO: make an appconstants enum
 
+let DEBUG_MODE = false
 let ALL_EXISTING_SONGS: [String] =  [
     "つぼみ",
     "恋が咲く季節",

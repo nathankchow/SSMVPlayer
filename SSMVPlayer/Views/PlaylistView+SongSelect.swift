@@ -40,14 +40,6 @@ struct PlaylistSongSelectView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-//            HStack {
-//                HStack {
-//                    Image(systemName: "person.fill")
-//                    
-//                    Text("Any")
-//                }
-//            }
-            
             HStack{
                 Picker("", selection: $filterIdolCount, content: {
                     HStack{
@@ -68,7 +60,7 @@ struct PlaylistSongSelectView: View {
                     filterIdolCount = -1
                 }
             }
-            .padding()
+            .padding(.bottom)
             .frame(maxWidth: .infinity)
             .background(.background.secondary)
             
@@ -86,7 +78,8 @@ struct PlaylistSongSelectView: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 100, height: 100)
-                            }
+                                    .opacity(isSongSelectable(song) ? 1.0 : 0.3)
+                            }.disabled(!isSongSelectable(song))
                             
                             Text(song.name)
                                 .font(.caption)
@@ -139,6 +132,13 @@ struct PlaylistSongSelectView: View {
             }
             .background(.background.secondary)
         }
+        .navigationTitle(playlist.name)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+    
+    func isSongSelectable(_ song: Song) -> Bool {
+        return (viewModel.songMetadataDict[song]?.localIdolCount ?? 0) +
+        (viewModel.songMetadataDict[song]?.youtubeIdolCount ?? 0) > 0
     }
 }
 

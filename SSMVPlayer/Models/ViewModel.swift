@@ -27,6 +27,14 @@ enum VideoType {
     case youtube
 }
 
+struct SongStaticMetadata: Codable {
+    let songName: String
+    let canonicalIdolCount: Int
+    let romanizedSpelling: String
+    let hiraganaSpelling: String
+    let attribute: String
+}
+
 struct SongMetadata {
     let song: Song
     let localGroupType: VideoGroupType
@@ -36,6 +44,7 @@ struct SongMetadata {
     let canonicalIdolCount: Int
     let romanizedSpelling: String
     let hiraganaSpelling: String
+    let attribute: String
 }
 
 @Observable
@@ -190,7 +199,15 @@ final class ViewModel {
         for song in songs {
             let (localGroupType, localIdolCount) = getGroupTypeAndSongCount(song, .local)
             let (youtubeGroupType, youtubeIdolCount) = getGroupTypeAndSongCount(song, .youtube)
-            let staticMetadata = staticDict[song.name, default: SongStaticMetadata(songName: song.name, canonicalIdolCount: -1, romanizedSpelling: song.name, hiraganaSpelling: song.name)]
+            let staticMetadata = staticDict[song.name,
+                default: SongStaticMetadata(
+                    songName: song.name,
+                    canonicalIdolCount: -1,
+                    romanizedSpelling: song.name,
+                    hiraganaSpelling: song.name,
+                    attribute: "all"
+                )
+            ]
             songMetadataDict[song] = SongMetadata(
                 song: song,
                 localGroupType: localGroupType,
@@ -199,10 +216,12 @@ final class ViewModel {
                 youtubeIdolCount: youtubeIdolCount,
                 canonicalIdolCount: staticMetadata.canonicalIdolCount,
                 romanizedSpelling: staticMetadata.romanizedSpelling,
-                hiraganaSpelling: staticMetadata.hiraganaSpelling
+                hiraganaSpelling: staticMetadata.hiraganaSpelling,
+                attribute: staticMetadata.attribute
             )
         }
     }
+    
     
     private func getGroupTypeAndSongCount(_ song: Song, _ videoType: VideoType) -> (VideoGroupType, Int){
         let relevantVideos: [Video]
@@ -323,9 +342,3 @@ struct Song: Codable, Hashable {
     }
 }
 
-struct SongStaticMetadata: Codable {
-    let songName: String
-    let canonicalIdolCount: Int
-    let romanizedSpelling: String
-    let hiraganaSpelling: String
-}

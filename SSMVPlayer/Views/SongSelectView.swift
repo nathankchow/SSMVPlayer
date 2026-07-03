@@ -3,7 +3,16 @@
 //  SSMVPlayer
 //
 //  Created by natha on 3/8/26.
-// #TODO: view is ugly
+// #TODO: why do we need a songmetadatadict? can't we just put all that information onto the song object directly?
+extension Color {
+    static let customWhite  = Color(red: 254/255, green: 254/255, blue: 254/255)
+    static let customRed    = Color(red: 254/255, green: 48/255,  blue: 129/255)
+    static let customBlue   = Color(red: 13/255,  green: 114/255, blue: 254/255)
+    static let customOrange = Color(red: 254/255, green: 170/255, blue: 17/255)
+    static let customBlack  = Color(red: 65/255,  green: 65/255,  blue: 65/255)
+    static let customGray = Color(red: 220/255,  green: 220/255,  blue: 220/255)
+    static let customPink = Color(red: 254/255,  green: 178/255,  blue: 233/255)
+    }
 
 import SwiftUI
 
@@ -29,53 +38,60 @@ struct SongSelectView: View {
         Set(availableSongs)
     }
     
+    func songRow(song: Song, isFocused: Bool) -> some View {
+        HStack{
+            Text("\(getSongQuotaString(song))\(song.name)")
+                .lineLimit(1)
+                .foregroundStyle(foregroundColor(for: song))
+                .fontWeight(focusedSong?.id == song.id ? .bold : .regular)
+                .padding(4)
+
+            
+            Spacer()
+            
+            if viewModel.songMetadataDict[song]?.localIdolCount ?? 0 > 0 {
+                Text("Local")
+                    .font(.caption)
+                    .padding(.horizontal, 4)
+                    .foregroundStyle(Color.customWhite)
+                    .background(.blue)
+                    .clipShape(Capsule())
+            }
+            
+            if viewModel.songMetadataDict[song]?.youtubeIdolCount ?? 0 > 0 {
+                Text("YouTube")
+                    .font(.caption)
+                    .padding(.horizontal, 4)
+                    .foregroundStyle(Color.customWhite)
+                    .background(.red)
+                    .clipShape(Capsule())
+                
+            }
+        }
+        .padding(.horizontal, 4)
+        .frame(maxWidth: .infinity, minHeight: 35, alignment: .leading)
+        .background(Color.customWhite)
+        .clipShape(RoundedRectangle(cornerRadius: 5))
+        .contentShape(Rectangle())
+        .overlay(
+            RoundedRectangle(cornerRadius: 4)
+                .stroke(focusedSong?.id == song.id ? Color.red : Color.clear, lineWidth: 3)
+        )
+    }
+    
     
     var body: some View {
         VStack(spacing: 0) {
             taggerButtonRow
                 .frame(maxWidth: .infinity)
-                .background(.mint)
+                .background(Color.customPink)
             
             Divider()
             
             ScrollView {
-                VStack() {
+                VStack(spacing: 3) {
                     ForEach(viewModel.songs, id: \.id) { song in
-                        HStack{
-                            Text("\(song.name)  (\(SONG_QUOTAS[song.name, default: 0]))")
-                                .lineLimit(1)
-                                .foregroundStyle(foregroundColor(for: song.name))
-                                .fontWeight(focusedSong?.id == song.id ? .bold : .regular)
-                                .padding(4)
-
-                            
-                            Spacer()
-                            
-                            if viewModel.songMetadataDict[song]?.localIdolCount ?? 0 > 0 {
-                                Text("Local")
-                                    .font(.caption)
-                                    .padding(.horizontal, 4)
-                                    .foregroundStyle(.white)
-                                    .background(.blue)
-                                    .clipShape(Capsule())
-                            }
-                            
-                            if viewModel.songMetadataDict[song]?.youtubeIdolCount ?? 0 > 0 {
-                                Text("YouTube")
-                                    .font(.caption)
-                                    .padding(.horizontal, 4)
-                                    .foregroundStyle(.white)
-                                    .background(.red)
-                                    .clipShape(Capsule())
-                                
-                            }
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 20, alignment: .leading)
-                        .contentShape(Rectangle())
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 4)
-                                .stroke(focusedSong?.id == song.id ? Color.red : Color.clear, lineWidth: 2)
-                        )
+                        songRow(song: song, isFocused: focusedSong == song)
                         .onTapGesture {
                             focusedSong = song
                         }
@@ -113,6 +129,7 @@ struct SongSelectView: View {
             .padding(.horizontal)
             .padding(.vertical, 8)
         }
+        .background(Color.customGray)
         .onAppear {
             focusedSong = viewModel.songs.first
         }
@@ -152,24 +169,29 @@ struct SongSelectView: View {
         .padding()
     }
     
-    func foregroundColor(for songName: String) -> Color {
-        guard let quota = SONG_QUOTAS[songName] else {
+    func getSongQuotaString(_ song: Song) -> String {
+        if DEBUG_MODE { return "(\(String(songCounts[song, default: 0]))) " }
+        else { return "" }
+    }
+    
+    func foregroundColor(for song: Song) -> Color {
+        guard let song = viewModel.songs.first(where: { $0 == song }),
+              let _ = songCounts[song] else {
+            return .gray
+        }
+        
+        guard let attribute = viewModel.songMetadataDict[song]?.attribute else {
             return .primary
         }
         
-        guard let song = viewModel.songs.first(where: { $0.name == songName }),
-              let count = songCounts[song] else {
-            return .gray
-        }
-        
-        if count == 0 {
-            return .gray
-        } else if count < quota {
-            return .yellow
-        } else if count > quota {
-            return .orange
+        if attribute == "cute" {
+            return .customRed
+        } else if attribute == "cool" {
+            return .customBlue
+        } else if attribute == "passion" {
+            return .customOrange
         } else {
-            return .primary
+            return .customBlack
         }
     }
 }

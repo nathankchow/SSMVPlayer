@@ -16,7 +16,8 @@ struct PlaylistCreateView: View {
             Section {
                 Button {
                     // #TODO: make name unique/dynamic
-                    let playlist = Playlist(name: "Untitled Playlist")
+                    let dupeString = " (\(String(viewModel.playlists.count)))"
+                    let playlist = Playlist(name: "Untitled Playlist\(viewModel.playlists.count == 0 ? "" : dupeString)")
                     viewModel.playlists.append(playlist)
                     newPlaylist = playlist
                 } label: {
@@ -29,13 +30,15 @@ struct PlaylistCreateView: View {
             }
             
             Section {
-                ForEach(viewModel.playlists, id: \.id) { playlist in
+                ForEach(viewModel.playlists.reversed(), id: \.id) { playlist in
                     NavigationLink(destination: PlaylistEditView(playlist: playlist)) {
                         Text(playlist.name)
                     }
                 }
             }
         }
+        .navigationTitle("Playlists")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(item: $newPlaylist) { playlist in
             PlaylistEditView(playlist: playlist)
         }
