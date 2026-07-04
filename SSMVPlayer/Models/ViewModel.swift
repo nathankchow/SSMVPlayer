@@ -47,6 +47,8 @@ struct SongMetadata {
     let attribute: String
 }
 
+
+
 @Observable
 final class ViewModel {
     var localVideos: [Video] = []
@@ -55,6 +57,7 @@ final class ViewModel {
     var youtubeVideos: [Video] = []
     var pivotIdol = "koharu"
     var playlists: [Playlist] = []
+    var soundEngine: SoundEngine = SoundEngine()
     
     private func getAvailableSongs() {
         songs = ALL_EXISTING_SONGS.map { Song(name: $0) }
@@ -306,7 +309,6 @@ final class ViewModel {
         loadVideosFromJSON()
         youtubeVideos = loadYoutubeVideos()
         computeSongMetadata()
-        print(self.songMetadataDict)
         Task {
             getLocalVideoAssets()
             await loadVideoURLs()

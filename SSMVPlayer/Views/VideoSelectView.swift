@@ -73,14 +73,17 @@ struct VideoSelectView: View {
                 Toggle("Use youtube videos", isOn: $useYoutubeVideos)
                     .padding(.horizontal)
                 
-                if groupType == .none {
-                    Text("No videos available")
-                        .fontWeight(.bold)
-                } else if groupType == .select {
-                    listIdolSelector
-                } else {
-                    DynamicIdolRowView($selectedIdols, hasPivotIdol: groupType == .pivot, idolCount: idolCount)
+                Group {
+                    if groupType == .none {
+                        Text("No videos available")
+                            .fontWeight(.bold)
+                    } else if groupType == .select {
+                        listIdolSelector
+                    } else {
+                        DynamicIdolRowView($selectedIdols, hasPivotIdol: groupType == .pivot, idolCount: idolCount)
+                    }
                 }
+                .frame(maxHeight: .infinity)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -96,6 +99,7 @@ struct VideoSelectView: View {
                     dismiss()
                 } else {
                     if groupType == .none { return }
+                    viewModel.soundEngine.previewPauseAndRewind()
                     if !useYoutubeVideos { localVideoToPlay = getLocalVideoToPlay() }
                     else { youtubeVideoToPlay = getYoutubeVideoToPlay() }
                 }
@@ -119,7 +123,9 @@ struct VideoSelectView: View {
                 useYoutubeVideos = true
             }
         }
-        .sheet(item: $localVideoToPlay) { video in
+        .sheet(item: $localVideoToPlay, onDismiss: {
+            viewModel.soundEngine.previewStart()
+        }) { video in
             if let avAsset = video.avAsset {
                 let playerItem = AVPlayerItem(asset: avAsset)
                 let player = AVPlayer(playerItem: playerItem)
@@ -130,7 +136,9 @@ struct VideoSelectView: View {
                     }
             }
         }
-        .sheet(item: $youtubeVideoToPlay) { video in
+        .sheet(item: $youtubeVideoToPlay, onDismiss: {
+            viewModel.soundEngine.previewStart()
+        }) { video in
             YouTubePlayerView(YouTubePlayer(stringLiteral: video.youtubeURL ?? ""))
                 .ignoresSafeArea()
 //            TestYoutubePlayerView(video.youtubeURL ?? "")

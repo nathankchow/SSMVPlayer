@@ -4,6 +4,7 @@
 //
 //  Created by natha on 5/21/26.
 //
+// #TODO: orugooru and orange sapphire have sound artifact at start
 
 import SwiftUI
 

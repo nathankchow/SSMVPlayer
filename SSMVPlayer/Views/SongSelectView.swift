@@ -4,6 +4,11 @@
 //
 //  Created by natha on 3/8/26.
 // #TODO: why do we need a songmetadatadict? can't we just put all that information onto the song object directly?
+// #TODO: try using a color set + dark mode colors
+// #TODO: Refactor the idol count picker into a single component
+// #TODO: coding style - get rid of force optional unwraps
+// #TODO: random button should 
+
 extension Color {
     static let customWhite  = Color(red: 254/255, green: 254/255, blue: 254/255)
     static let customRed    = Color(red: 254/255, green: 48/255,  blue: 129/255)
@@ -12,6 +17,7 @@ extension Color {
     static let customBlack  = Color(red: 65/255,  green: 65/255,  blue: 65/255)
     static let customGray = Color(red: 220/255,  green: 220/255,  blue: 220/255)
     static let customPink = Color(red: 254/255,  green: 178/255,  blue: 233/255)
+    static let customDarkGray = Color(red: 196/255, green: 196/255, blue: 196/255)
     }
 
 import SwiftUI
@@ -20,10 +26,23 @@ struct SongSelectView: View {
     @Environment(ViewModel.self) private var viewModel
     @State var focusedSong: Song? = nil
     @State var showTaggerSheet = false
+    @State var filterIdolCount = -1
+    @State var didSetInitialSong = false
+    
+    var filterIdolCountChoices = [-1,5,4,3,2,1]
         
     var availableSongs: [Song] {
-        viewModel.songs.filter { song in
-            viewModel.localVideos.map { $0.songName }.contains(song.name)
+//        let available = viewModel.songs.filter { song in
+//            viewModel.localVideos.map { $0.songName }.contains(song.name)  || viewModel.youtubeVideos.map {
+//                $0.songName }.contains(song.name)
+//        }
+        
+        let available = viewModel.songs
+        
+        if filterIdolCount == -1 { return available }
+        
+        return available.filter {
+            viewModel.songMetadataDict[$0]?.canonicalIdolCount ?? -1 == filterIdolCount
         }
     }
     
@@ -43,7 +62,8 @@ struct SongSelectView: View {
             Text("\(getSongQuotaString(song))\(song.name)")
                 .lineLimit(1)
                 .foregroundStyle(foregroundColor(for: song))
-                .fontWeight(focusedSong?.id == song.id ? .bold : .regular)
+//                .fontWeight(focusedSong?.id == song.id ? .bold : .regular)
+                .fontWeight(.bold)
                 .padding(4)
 
             
@@ -86,19 +106,44 @@ struct SongSelectView: View {
                 .frame(maxWidth: .infinity)
                 .background(Color.customPink)
             
-            Divider()
+            HStack{
+                Picker("", selection: $filterIdolCount, content: {
+                    HStack{
+                        Text("Any")
+                        Image(systemName: "person.fill")
+                    }.tag(-1)
+                    ForEach((1...5).reversed(), id: \.self) {i in
+                        HStack{
+                            Text("\(i)")
+                            Image(systemName: "person.fill")
+                            Text("wtf")
+                        }.tag(i)
+                    }
+                })
+                .pickerStyle(.menu)
+                
+                Button("Reset") {
+                    filterIdolCount = -1
+                }
+            }
+            .padding(.vertical, 5)
+            .frame(maxWidth: .infinity)
+            .background(Color.customDarkGray)
             
             ScrollView {
                 VStack(spacing: 3) {
-                    ForEach(viewModel.songs, id: \.id) { song in
+                    ForEach(availableSongs, id: \.id) { song in
                         songRow(song: song, isFocused: focusedSong == song)
                         .onTapGesture {
-                            focusedSong = song
+                            if focusedSong != song {
+                                focusedSong = song
+                            }
                         }
                     }
                 }
             }
             .padding(.horizontal)
+            .background(Color.customGray)
             
             HStack(spacing: 16) {
                 if let song = focusedSong {
@@ -111,27 +156,51 @@ struct SongSelectView: View {
                     Image(systemName: "house")
                         .frame(width: 200, height: 200)
                 }
-
-                NavigationLink(destination: VideoSelectView(song: focusedSong ?? viewModel.songs.first!, metadata: viewModel.songMetadataDict[focusedSong ?? viewModel.songs.first!]!)) {
-                    VStack(spacing: 8) {
-                        Image(systemName: "play.fill")
-                            .font(.system(size: 36))
-                        Text("Play")
-                            .font(.headline)
+                VStack(spacing: 0) {
+                    Button {
+                        focusedSong = getRandomSong()
+                    } label: {
+                        VStack(spacing: 8) {
+                            Image(systemName: "shuffle")
+                                .font(.system(size: 36))
+                            Text("Random")
+                                .font(.headline)
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, minHeight: 100)
+                        .background(.blue)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity, minHeight: 200)
-                    .background(.pink)
-                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    
+                    NavigationLink(destination: VideoSelectView(song: focusedSong ?? viewModel.songs.first!, metadata: viewModel.songMetadataDict[focusedSong ?? viewModel.songs.first!]!)) {
+                        VStack(spacing: 8) {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 36))
+                            Text("Play")
+                                .font(.headline)
+                        }
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity, minHeight: 100)
+                        .background(.pink)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+                    .disabled(focusedSong == nil)
                 }
-                .disabled(focusedSong == nil)
             }
             .padding(.horizontal)
             .padding(.vertical, 8)
+            .background(Color.customDarkGray)
         }
-        .background(Color.customGray)
         .onAppear {
-            focusedSong = viewModel.songs.first
+            if !didSetInitialSong {
+                focusedSong = availableSongs.first
+                didSetInitialSong = true
+            }
+        }
+        .onChange(of: focusedSong) { oldSong, newSong in
+            if newSong == nil { return }
+            guard let newSong = newSong else { return }
+            viewModel.soundEngine.changeSong(newSong)
         }
     }
     
@@ -169,6 +238,16 @@ struct SongSelectView: View {
         .padding()
     }
     
+    func getRandomSong() -> Song? {
+        //never return current focused song if > 1 songs available
+        if availableSongs.count == 0 { return focusedSong }
+        if availableSongs.count == 1 { return availableSongs.first }
+        guard let currentSong = focusedSong else { return focusedSong } //focusedSong should never be nil
+        return availableSongs
+            .filter{$0 != currentSong}
+            .randomElement()
+    }
+    
     func getSongQuotaString(_ song: Song) -> String {
         if DEBUG_MODE { return "(\(String(songCounts[song, default: 0]))) " }
         else { return "" }
@@ -198,10 +277,6 @@ struct SongSelectView: View {
 
 
 
-//#Preview {
-//    SongSelectView()
-//        .environment(ViewModel())
-//}
 
 #Preview {
     SongSelectView()
