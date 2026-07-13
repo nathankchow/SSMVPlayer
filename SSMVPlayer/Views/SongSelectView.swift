@@ -101,25 +101,21 @@ struct SongSelectView: View {
                         Text("Any")
                         Image(systemName: "person.fill")
                     }
+                    .frame(maxWidth: .infinity)
                     .tag(-1)
                     ForEach((1...5).reversed(), id: \.self) {i in
                         HStack{
                             Text("\(i)")
                             Image(systemName: "person.fill")
                             Text("wtf")
-                        }.tag(i)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .tag(i)
                         
                     }
                 })
                 .pickerStyle(.menu)
                 .tint(Color.white)
-                
-                Button {
-                    filterIdolCount = -1
-                } label: {
-                    Text("Reset")
-                        .foregroundStyle(Color.white)
-                }
             }
             .padding(.vertical, 5)
             .frame(maxWidth: .infinity)
