@@ -5,7 +5,10 @@
 //  Created by natha on 6/4/26.
 // #TODO: make an appconstants enum
 
+import SwiftUI
+
 let DEBUG_MODE = false
+
 let ALL_EXISTING_SONGS: [String] =  [
     "つぼみ",
     "恋が咲く季節",
@@ -73,8 +76,6 @@ let ALL_EXISTING_SONGS: [String] =  [
 ]
 
 
-
-
 let SONG_QUOTAS: [String: Int] = [
     "つぼみ": 8,
     "恋が咲く季節": 1,
@@ -102,7 +103,7 @@ let SONG_QUOTAS: [String: Int] = [
     "Drastic Melody": 3,
     "UNIQU3 VOICES!!!": 3,
     "ジュビリー": 8,
-    "We wish your smile": 8,
+    "We wish your smile›": 8,
     "Never say never": 2,
     "ヴィーナスシンドローム": 2,
     "TOKIMEKIエスカレート": 1,
@@ -129,3 +130,16 @@ let SONG_QUOTAS: [String: Int] = [
     "M@GIC☆": 1,
     "shabon song": 1
 ]
+
+extension Color {
+    static let customWhite  = Color(red: 254/255, green: 254/255, blue: 254/255)
+    static let customRed    = Color(red: 254/255, green: 48/255,  blue: 129/255)
+    static let customBlue   = Color(red: 13/255,  green: 114/255, blue: 254/255)
+    static let customOrange = Color(red: 254/255, green: 170/255, blue: 17/255)
+    static let customBlack  = Color(red: 65/255,  green: 65/255,  blue: 65/255)
+    static let customGray = Color(red: 220/255,  green: 220/255,  blue: 220/255)
+    static let customPink = Color(red: 254/255,  green: 178/255,  blue: 233/255)
+    static let customDarkGray = Color(red: 196/255, green: 196/255, blue: 196/255)
+    static let customRose = Color(red: 118/255, green: 25/255, blue: 62/255)
+
+}

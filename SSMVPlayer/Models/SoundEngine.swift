@@ -27,6 +27,7 @@ final class SoundEngine {
     
     func previewStop() {
         previewPlayer?.stop()
+        previewPlayer = nil
     }
     
     

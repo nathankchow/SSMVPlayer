@@ -9,23 +9,12 @@
 // #TODO: coding style - get rid of force optional unwraps
 // #TODO: random button should 
 
-extension Color {
-    static let customWhite  = Color(red: 254/255, green: 254/255, blue: 254/255)
-    static let customRed    = Color(red: 254/255, green: 48/255,  blue: 129/255)
-    static let customBlue   = Color(red: 13/255,  green: 114/255, blue: 254/255)
-    static let customOrange = Color(red: 254/255, green: 170/255, blue: 17/255)
-    static let customBlack  = Color(red: 65/255,  green: 65/255,  blue: 65/255)
-    static let customGray = Color(red: 220/255,  green: 220/255,  blue: 220/255)
-    static let customPink = Color(red: 254/255,  green: 178/255,  blue: 233/255)
-    static let customDarkGray = Color(red: 196/255, green: 196/255, blue: 196/255)
-    }
 
 import SwiftUI
 
 struct SongSelectView: View {
     @Environment(ViewModel.self) private var viewModel
     @State var focusedSong: Song? = nil
-    @State var showTaggerSheet = false
     @State var filterIdolCount = -1
     @State var didSetInitialSong = false
     
@@ -111,24 +100,30 @@ struct SongSelectView: View {
                     HStack{
                         Text("Any")
                         Image(systemName: "person.fill")
-                    }.tag(-1)
+                    }
+                    .tag(-1)
                     ForEach((1...5).reversed(), id: \.self) {i in
                         HStack{
                             Text("\(i)")
                             Image(systemName: "person.fill")
                             Text("wtf")
                         }.tag(i)
+                        
                     }
                 })
                 .pickerStyle(.menu)
+                .tint(Color.white)
                 
-                Button("Reset") {
+                Button {
                     filterIdolCount = -1
+                } label: {
+                    Text("Reset")
+                        .foregroundStyle(Color.white)
                 }
             }
             .padding(.vertical, 5)
             .frame(maxWidth: .infinity)
-            .background(Color.customDarkGray)
+            .background(Color.customRose)
             
             ScrollView {
                 VStack(spacing: 3) {
@@ -192,31 +187,36 @@ struct SongSelectView: View {
             .background(Color.customDarkGray)
         }
         .onAppear {
+            print("PARENT VIEW APPEARED")
             if !didSetInitialSong {
                 focusedSong = availableSongs.first
                 didSetInitialSong = true
             }
+            viewModel.soundEngine.previewStart()
         }
         .onChange(of: focusedSong) { oldSong, newSong in
             if newSong == nil { return }
             guard let newSong = newSong else { return }
             viewModel.soundEngine.changeSong(newSong)
         }
+        .onDisappear {
+            print("PARENT VIEW DISAPPEARED")
+        }
     }
     
     var taggerButtonRow: some View {
-        HStack{
-            Button {
-                showTaggerSheet = true
-            } label: {
+        HStack {
+            NavigationLink(destination:
+                VideoTaggerView()
+                    .onAppear{
+                        viewModel.soundEngine.previewPauseAndRewind()
+                    }
+            ) {
                 HStack {
                     Image(systemName: "tag.fill")
                     Text("Tagger")
                 }
                 .contentShape(Rectangle())
-            }
-            .sheet(isPresented: $showTaggerSheet) {
-                VideoTaggerView()
             }
             
             Button {
@@ -228,7 +228,12 @@ struct SongSelectView: View {
                 }
             }
             
-            NavigationLink(destination: PlaylistCreateView()) {
+            NavigationLink(destination:
+                PlaylistCreateView()
+                    .onAppear{
+                        viewModel.soundEngine.previewPauseAndRewind()
+                    }
+            ) {
                 HStack {
                     Image(systemName: "list.bullet")
                     Text("Playlists")
@@ -253,6 +258,7 @@ struct SongSelectView: View {
         else { return "" }
     }
     
+    
     func foregroundColor(for song: Song) -> Color {
         guard let song = viewModel.songs.first(where: { $0 == song }),
               let _ = songCounts[song] else {
@@ -273,6 +279,7 @@ struct SongSelectView: View {
             return .customBlack
         }
     }
+
 }
 
 
