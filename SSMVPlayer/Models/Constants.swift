@@ -140,6 +140,6 @@ extension Color {
     static let customGray = Color(red: 220/255,  green: 220/255,  blue: 220/255)
     static let customPink = Color(red: 254/255,  green: 178/255,  blue: 233/255)
     static let customDarkGray = Color(red: 196/255, green: 196/255, blue: 196/255)
-    static let customRose = Color(red: 118/255, green: 25/255, blue: 62/255)
+    static let customSkyBlue = Color(red: 135/255, green: 206/255, blue: 250/255)
 
 }

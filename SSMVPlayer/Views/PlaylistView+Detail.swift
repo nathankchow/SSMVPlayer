@@ -10,11 +10,17 @@
 
 import SwiftUI
 
-struct PlaylistEditView: View {
+struct PlaylistLaunchParameters: Identifiable {
+    let id = UUID()
+    let playlist: Playlist
+    let index: Int
+}
+
+struct PlaylistDetailView: View {
     @Environment(ViewModel.self) private var viewModel
     let playlist: Playlist
     @State var showAlert = false
-    @State private var playlistToPlay: Playlist? = nil
+    @State private var playlistLaunchParameters: PlaylistLaunchParameters? = nil
     
     var videos: [Video] {
         playlist.entries.compactMap(\.video)
@@ -71,8 +77,8 @@ struct PlaylistEditView: View {
             .toolbar {
                 EditButton()
             }
-            .sheet(item: $playlistToPlay) { p in
-                PlaylistPlayerView(playlist: p)
+            .sheet(item: $playlistLaunchParameters) { p in
+                PlaylistPlayerView(playlist: p.playlist, index: p.index )
             }
 
         .overlay(alignment: .bottomTrailing) {
@@ -99,11 +105,11 @@ struct PlaylistEditView: View {
     }
     
     func playPlaylist(from index: Int) {
-        playlistToPlay = playlist
+        playlistLaunchParameters = PlaylistLaunchParameters(playlist: playlist, index: index)
     }
 }
 
 #Preview {
-    PlaylistEditView(playlist: Playlist.samplePlaylist())
+    PlaylistDetailView(playlist: Playlist.samplePlaylist())
         .environment(ViewModel())
 }

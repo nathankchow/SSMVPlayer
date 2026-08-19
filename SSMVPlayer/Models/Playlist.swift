@@ -68,7 +68,7 @@ struct PlaylistEntry {
 class PlaybackQueue {
     var playlist: Playlist
     var videos: [Video]
-    var index: Int = 0
+    var index: Int
 
     var currentVideo: Video? {
         guard self.videos.indices.contains(index) else { return nil }
@@ -86,8 +86,9 @@ class PlaybackQueue {
         }
     }
     
-    init(_ playlist: Playlist) {
+    init(_ playlist: Playlist, index: Int) {
         self.playlist = playlist
         self.videos = playlist.entries.compactMap{ $0.video }
+        self.index = index
     }
 }

@@ -14,8 +14,8 @@ class DualPlayerManager {
 
     private var localObserver: NSObjectProtocol?
 
-    init(_ playlist: Playlist) {
-        self.playbackQueue = PlaybackQueue(playlist)
+    init(_ playlist: Playlist, index: Int) {
+        self.playbackQueue = PlaybackQueue(playlist, index: index)
     }
 
     func loadCurrentVideo() {
@@ -96,6 +96,7 @@ struct PlaylistPlayerView: View {
 
     let youtubeTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     let playlist: Playlist
+    let index: Int
 
     var body: some View {
         Group {
@@ -123,7 +124,7 @@ struct PlaylistPlayerView: View {
         .onAppear {
             guard !hasAppeared else { return }
             hasAppeared = true
-            manager = DualPlayerManager(playlist)
+            manager = DualPlayerManager(playlist, index: index)
             manager?.loadCurrentVideo()
         }
         .onChange(of: manager?.isFinished) { _, finished in

@@ -32,7 +32,7 @@ struct PlaylistCreateView: View {
             
             Section {
                 ForEach(viewModel.playlists.reversed(), id: \.id) { playlist in
-                    NavigationLink(destination: PlaylistEditView(playlist: playlist)) {
+                    NavigationLink(destination: PlaylistDetailView(playlist: playlist)) {
                         Text(playlist.name)
                     }
                 }
@@ -41,7 +41,7 @@ struct PlaylistCreateView: View {
         .navigationTitle("Playlists")
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(item: $newPlaylist) { playlist in
-            PlaylistEditView(playlist: playlist)
+            PlaylistDetailView(playlist: playlist)
         }
     }
 }
