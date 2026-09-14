@@ -8,7 +8,6 @@
 // #TODO: coding style - get rid of force optional unwraps
 // #TODO: song preview artifacts: orgel, orange sapphire, + one more(?)
 // #TODO: tsubomi song badly cut
-// #TODO: remove refresh button
 // #TODO: consider using a tabview to navigate to playlists + tagger
 
 
@@ -46,9 +45,9 @@ struct SongSelectView: View {
         VStack(spacing: 0) {
             topButtonRow
             
-            idolCountPicker
-            
             songPicker
+            
+            idolCountPicker
             
             bottomSection
         }
