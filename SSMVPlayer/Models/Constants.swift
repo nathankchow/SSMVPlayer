@@ -141,5 +141,11 @@ extension Color {
     static let customPink = Color(red: 254/255,  green: 178/255,  blue: 233/255)
     static let customDarkGray = Color(red: 196/255, green: 196/255, blue: 196/255)
     static let customSkyBlue = Color(red: 135/255, green: 206/255, blue: 250/255)
+}
 
+func colorFromAttribute(_ att: String) -> Color {
+    if att == "cute" { return .customRed }
+    if att == "cool" { return .customBlue }
+    if att == "passion" { return .customOrange }
+    return .customBlack
 }

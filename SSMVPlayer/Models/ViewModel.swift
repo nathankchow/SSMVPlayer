@@ -33,6 +33,7 @@ struct SongStaticMetadata: Codable {
     let romanizedSpelling: String
     let hiraganaSpelling: String
     let attribute: String
+
 }
 
 struct SongMetadata {
@@ -45,6 +46,7 @@ struct SongMetadata {
     let romanizedSpelling: String
     let hiraganaSpelling: String
     let attribute: String
+    let originalSingers: [String]
 }
 
 
@@ -211,6 +213,13 @@ final class ViewModel {
                     attribute: "all"
                 )
             ]
+            let originalSingersURL = Bundle.main.url(forResource: "originalIdols", withExtension: "json")!
+            var originalSingerDict: [String: [String]] = [:]
+            do {
+                let originalSingerData = try Data(contentsOf: originalSingersURL)
+                originalSingerDict = try JSONDecoder().decode([String:[String]].self, from: originalSingerData)
+            } catch {}
+            
             songMetadataDict[song] = SongMetadata(
                 song: song,
                 localGroupType: localGroupType,
@@ -220,7 +229,8 @@ final class ViewModel {
                 canonicalIdolCount: staticMetadata.canonicalIdolCount,
                 romanizedSpelling: staticMetadata.romanizedSpelling,
                 hiraganaSpelling: staticMetadata.hiraganaSpelling,
-                attribute: staticMetadata.attribute
+                attribute: staticMetadata.attribute,
+                originalSingers: originalSingerDict[song.name] ?? ["---","---","---","---","---"]
             )
         }
     }

@@ -14,28 +14,34 @@ struct DynamicIdolRowView: View {
     let idolCount: Int
     let hasPivotIdol: Bool
     let order = [4,2,1,3,5]
+    let songMetadata: SongMetadata
+    
     
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
             ForEach(idols.indices, id: \.self) { index in
-                IdolCellView(idol: idols[index])
-                    .opacity(order[index] > idolCount ? 0.5 : 1)
-                    .padding(3)
-                    .overlay(
-                        Rectangle()
-                            .stroke(selectedIndex == index ? Color.red : Color.clear, lineWidth: 3)
-                    )
-                    .overlay(
-                        Group {
-                            if hasPivotIdol && showLock(index: index) {
-                                Image(systemName: "lock.fill")
-                                    .foregroundColor(.white)
+                VStack(spacing: 0){
+                    OriginalSingerCellLabelView(originalSinger: songMetadata.originalSingers[index], size: 80)
+                    
+                    IdolCellView(idol: idols[index])
+                        .opacity(order[index] > idolCount ? 0.5 : 1)
+                        .padding(3)
+                        .overlay(
+                            Rectangle()
+                                .stroke(selectedIndex == index ? Color.red : Color.clear, lineWidth: 3)
+                        )
+                        .overlay(
+                            Group {
+                                if hasPivotIdol && showLock(index: index) {
+                                    Image(systemName: "lock.fill")
+                                        .foregroundColor(.white)
+                                }
                             }
+                        )
+                        .onTapGesture {
+                            tapGestureCallback(index)
                         }
-                    )
-                    .onTapGesture {
-                        tapGestureCallback(index)
-                    }
+                }
             }
         }
     }
@@ -77,26 +83,32 @@ struct DynamicIdolRowView: View {
         selectedIndex = nil
     }
     
-    init(_ idols: Binding<[String]>, hasPivotIdol: Bool, idolCount: Int = 1) {
+    init(_ idols: Binding<[String]>, hasPivotIdol: Bool, idolCount: Int = 1, songMetadata: SongMetadata) {
         self._idols = idols
         self.idolCount = idolCount
         self.hasPivotIdol = hasPivotIdol
+        self.songMetadata = songMetadata
     }
 }
 
 struct StaticIdolRowView: View {
     var idols: [String] = ["","","","",""]
     let idolCellSize: CGFloat
+    let songMetadata: SongMetadata
     
     var body: some View {
         HStack {
             ForEach(idols.indices, id: \.self) { index in
-                IdolCellView(idol: idols[index], size: idolCellSize)
+                VStack(spacing: 0) {
+                    OriginalSingerCellLabelView(originalSinger: songMetadata.originalSingers[index], size: idolCellSize)
+                    
+                    IdolCellView(idol: idols[index], size: idolCellSize)
+                }
             }
         }
     }
     
-    init(_ inputIdols: [String], idolCellSize: CGFloat = 70) {
+    init(_ inputIdols: [String], idolCellSize: CGFloat = 80, songMetadata: SongMetadata) {
         let idolCount = inputIdols.count
         self.idolCellSize = idolCellSize
         var currentIndex = 2 - (idolCount / 2) //2, 1, 1, 0, 0
@@ -104,14 +116,14 @@ struct StaticIdolRowView: View {
             idols[currentIndex] = idol
             currentIndex += 1
         }
+        self.songMetadata = songMetadata
     }
     
-    init(_ video: Video?, idolCellSize: CGFloat = 70) {
-        self.init(video?.idols ?? [], idolCellSize: idolCellSize)
+    init(_ video: Video?, idolCellSize: CGFloat = 80, songMetadata: SongMetadata) {
+        self.init(video?.idols ?? [], idolCellSize: idolCellSize, songMetadata: songMetadata)
     }
 }
 
-// #TODO: probably want to name the images differently
 struct IdolCellView: View {
     let idol: String
     let size: CGFloat
@@ -136,12 +148,38 @@ struct IdolCellView: View {
         }
     }
     
-    init(idol: String, size: CGFloat = 70) {
+    init(idol: String, size: CGFloat = 80) {
         self.idol = idol
         self.size = size
     }
 }
 
-#Preview {
-    StaticIdolRowView(["arisu", "koharu"])
+struct OriginalSingerCellLabelView: View {
+    let originalSinger: String
+    let size: CGFloat
+    
+    var singerAttribute: String {
+        getSingerAttribute(singer: originalSinger)
+    }
+    
+    var body: some View {
+        Text(originalSinger)
+            .lineLimit(1)
+            .font(.caption)
+            .padding(.vertical, 2)
+            .frame(width: size)
+            .background(colorFromAttribute(singerAttribute))
+            .clipShape(.capsule)
+    }
+    
+    func getSingerAttribute(singer: String) -> String {
+        let url = Bundle.main.url(forResource: "idolAtt", withExtension: "json")!
+        do {
+            let data = try Data(contentsOf: url)
+            let json = try JSONDecoder().decode([String: String].self, from: data)
+            return json[singer, default: ""]
+        } catch {
+            return ""
+        }
+    }
 }

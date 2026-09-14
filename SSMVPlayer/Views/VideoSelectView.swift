@@ -66,7 +66,7 @@ struct VideoSelectView: View {
             .map { selectedIdols[$0] }
     }
 
-    
+    // #TODO: remove force unwrap
     var body: some View {
         Group {
             VStack {
@@ -80,7 +80,7 @@ struct VideoSelectView: View {
                     } else if groupType == .select {
                         listIdolSelector
                     } else {
-                        DynamicIdolRowView($selectedIdols, hasPivotIdol: groupType == .pivot, idolCount: idolCount)
+                        DynamicIdolRowView($selectedIdols, hasPivotIdol: groupType == .pivot, idolCount: idolCount, songMetadata: songMetadata)
                     }
                 }
                 .frame(maxHeight: .infinity)
@@ -148,7 +148,7 @@ struct VideoSelectView: View {
     var listIdolSelector: some View {
         ScrollView{
             ForEach(songVideos, id: \.id) { video in
-                StaticIdolRowView(video.idols)
+                StaticIdolRowView(video.idols, songMetadata: songMetadata)
                     .padding(4)
                     .overlay(
                         RoundedRectangle(cornerRadius: 4)
