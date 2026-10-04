@@ -128,11 +128,18 @@ struct StaticIdolRowView: View {
 }
 
 struct IdolCellView: View {
+    @Environment(ViewModel.self) private var viewModel
+
     let idol: String
     let size: CGFloat
-    
+
+    private var imageName: String {
+        viewModel.customIdolIcons[idol] ?? "\(idol)-default"
+    }
+
     var body: some View {
         if idol == "" {
+            // unchanged placeholder branch
             Image(systemName: "sparkles")
                 .resizable()
                 .scaledToFit()
@@ -141,22 +148,21 @@ struct IdolCellView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 .overlay(
                     RoundedRectangle(cornerRadius: 8)
-                        .stroke(.secondary, lineWidth: 2) 
+                        .stroke(.secondary, lineWidth: 2)
                 )
         } else {
-            Image("\(idol)-default")
+            Image(imageName)
                 .resizable()
                 .scaledToFit()
                 .frame(width: size, height: size)
         }
     }
-    
+
     init(idol: String, size: CGFloat = 80) {
         self.idol = idol
         self.size = size
     }
 }
-
 struct OriginalSingerCellLabelView: View {
     let originalSinger: String
     let size: CGFloat

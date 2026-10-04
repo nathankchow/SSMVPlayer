@@ -33,7 +33,6 @@ struct SongStaticMetadata: Codable {
     let romanizedSpelling: String
     let hiraganaSpelling: String
     let attribute: String
-
 }
 
 struct SongMetadata {
@@ -60,6 +59,12 @@ final class ViewModel {
     var pivotIdol = "koharu"
     var playlists: [Playlist] = []
     var soundEngine: SoundEngine = SoundEngine()
+    var customIdolIcons: [String: String] =  UserDefaults.standard.dictionary(forKey: "customIdolIcons") as? [String:String] ?? [:]
+
+    
+    func saveIdolIcons() {
+        UserDefaults.standard.set(customIdolIcons, forKey: "customIdolIcons")
+    }
     
     private func getAvailableSongs() {
         songs = ALL_EXISTING_SONGS.map { Song(name: $0) }

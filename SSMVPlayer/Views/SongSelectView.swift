@@ -96,6 +96,25 @@ struct SongSelectView: View {
                 .frame(maxWidth: .infinity)
                 .contentShape(Rectangle())
             }
+            
+            Divider()
+                .frame(height: 26)
+            
+            NavigationLink(destination:
+                SettingsView()
+                    .onAppear{
+                        viewModel.soundEngine.previewPauseAndRewind()
+                    }
+            ) {
+                HStack {
+                    Image(systemName: "gearshape.fill")
+                    Text("Settings")
+                }
+                .foregroundStyle(Color.customBlack)
+                .frame(maxWidth: .infinity)
+                .contentShape(Rectangle())
+            }
+
         }
         .padding()
         .frame(maxWidth: .infinity)
