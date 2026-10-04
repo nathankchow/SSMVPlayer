@@ -62,7 +62,7 @@ struct PlaylistDetailView: View {
                                 NavigationLink(destination: VideoSelectView(song: entry.song, metadata: viewModel.songMetadataDict[entry.song]!, playlist: playlist, playlistEntryIndex: index))
                                 {
                                     // #TODO: dont force unwrap here
-                                    StaticIdolRowView(entry.video, idolCellSize: 50, songMetadata: viewModel.songMetadataDict[entry.song]!)
+                                    StaticIdolRowView(entry.video, idolCellSize: 50, songMetadata: viewModel.songMetadataDict[entry.song]!, disableOriginalSingers: true)
                                         .contentShape(Rectangle())
                                 }
                             }

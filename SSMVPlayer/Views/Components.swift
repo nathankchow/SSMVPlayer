@@ -16,7 +16,6 @@ struct DynamicIdolRowView: View {
     let order = [4,2,1,3,5]
     let songMetadata: SongMetadata
     
-    
     var body: some View {
         HStack(spacing: 0) {
             ForEach(idols.indices, id: \.self) { index in
@@ -95,12 +94,15 @@ struct StaticIdolRowView: View {
     var idols: [String] = ["","","","",""]
     let idolCellSize: CGFloat
     let songMetadata: SongMetadata
+    let disableOriginalSingers: Bool
     
     var body: some View {
         HStack {
             ForEach(idols.indices, id: \.self) { index in
                 VStack(spacing: 0) {
-                    OriginalSingerCellLabelView(originalSinger: songMetadata.originalSingers[index], size: idolCellSize)
+                    if !disableOriginalSingers {
+                        OriginalSingerCellLabelView(originalSinger: songMetadata.originalSingers[index], size: idolCellSize)
+                    }
                     
                     IdolCellView(idol: idols[index], size: idolCellSize)
                 }
@@ -108,7 +110,7 @@ struct StaticIdolRowView: View {
         }
     }
     
-    init(_ inputIdols: [String], idolCellSize: CGFloat = 80, songMetadata: SongMetadata) {
+    init(_ inputIdols: [String], idolCellSize: CGFloat = 80, songMetadata: SongMetadata, disableOriginalSingers: Bool = false) {
         let idolCount = inputIdols.count
         self.idolCellSize = idolCellSize
         var currentIndex = 2 - (idolCount / 2) //2, 1, 1, 0, 0
@@ -117,10 +119,11 @@ struct StaticIdolRowView: View {
             currentIndex += 1
         }
         self.songMetadata = songMetadata
+        self.disableOriginalSingers = true
     }
     
-    init(_ video: Video?, idolCellSize: CGFloat = 80, songMetadata: SongMetadata) {
-        self.init(video?.idols ?? [], idolCellSize: idolCellSize, songMetadata: songMetadata)
+    init(_ video: Video?, idolCellSize: CGFloat = 80, songMetadata: SongMetadata, disableOriginalSingers: Bool = false) {
+        self.init(video?.idols ?? [], idolCellSize: idolCellSize, songMetadata: songMetadata, disableOriginalSingers: disableOriginalSingers)
     }
 }
 
